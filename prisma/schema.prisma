@@ -1,0 +1,138 @@
+// SkillShiftAI - Job Redesign & Reskilling Platform
+// Database Schema with PostgreSQL + pgvector support
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── User Model ───────────────────────────────────────────────
+model User {
+  id             String        @id @default(uuid())
+  name           String
+  email          String        @unique
+  currentJobTitle String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  userSkills     UserSkill[]
+  sessions       Session[]
+
+  @@map("users")
+}
+
+// ─── Master Skill Catalog ─────────────────────────────────────
+model MasterSkill {
+  id          String      @id @default(uuid())
+  skillName   String      @unique
+  category    String
+  description String?
+  embedding   Unsupported("vector(1536)")? // pgvector: 1536 dimensions for OpenAI-compatible embeddings
+  createdAt   DateTime    @default(now())
+  userSkills  UserSkill[]
+  jobSkills   JobSkill[]
+
+  @@map("master_skills")
+}
+
+// ─── Job / Position ───────────────────────────────────────────
+model Job {
+  id              String     @id @default(uuid())
+  title           String
+  description     String?
+  department      String?
+  isRedesigned    Boolean    @default(false)
+  parentJobId     String?
+  parentJob       Job?       @relation("JobHierarchy", fields: [parentJobId], references: [id])
+  childJobs       Job[]      @relation("JobHierarchy")
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  tasks           JobTask[]
+  jobSkills       JobSkill[]
+
+  @@map("jobs")
+}
+
+// ─── Job Task (atomic work items for redesign analysis) ───────
+model JobTask {
+  id                String   @id @default(uuid())
+  jobId             String
+  job               Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  taskDescription   String
+  automationRiskScore Float  @default(0.0) // 0.0 - 1.0
+  impactLevel       String   @default("medium") // low, medium, high, critical
+  frequency         String?  // daily, weekly, monthly, ad-hoc
+  estimatedHours    Float?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("job_tasks")
+}
+
+// ─── User Skill (proficiency mapping) ─────────────────────────
+model UserSkill {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId         String
+  skill           MasterSkill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  proficiencyLevel Int     @default(1) // 1-5 scale
+  lastAssessedAt  DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  @@unique([userId, skillId])
+  @@map("user_skills")
+}
+
+// ─── Job-Skill relationship ───────────────────────────────────
+model JobSkill {
+  id              String   @id @default(uuid())
+  jobId           String
+  job             Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  skillId         String
+  skill           MasterSkill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  importanceLevel Int      @default(3) // 1-5 scale
+  createdAt       DateTime @default(now())
+
+  @@unique([jobId, skillId])
+  @@map("job_skills")
+}
+
+// ─── Session (user activity tracking) ─────────────────────────
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startedAt DateTime @default(now())
+  endedAt   DateTime?
+  activity  Json?    // flexible JSON for session metadata
+
+  @@map("sessions")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// pgvector Setup Instructions
+// ═══════════════════════════════════════════════════════════════
+// Run these SQL commands AFTER `prisma db push` to enable pgvector:
+//
+// 1. Enable the vector extension:
+//    CREATE EXTENSION IF NOT EXISTS vector;
+//
+// 2. Create HNSW index for fast similarity search on master_skills:
+//    CREATE INDEX idx_master_skills_embedding
+//    ON master_skills
+//    USING hnsw (embedding vector_cosine_ops)
+//    WITH (m = 16, ef_construction = 64);
+//
+// 3. Example vector similarity query:
+//    SELECT id, skill_name, category,
+//           1 - (embedding <=> $1::vector) AS similarity
+//    FROM master_skills
+//    WHERE embedding IS NOT NULL
+//    ORDER BY embedding <=> $1::vector
+//    LIMIT 10;
+//
+// You can run these via `prisma db execute` or directly in your database client.
