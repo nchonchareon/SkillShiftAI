@@ -196,6 +196,37 @@ export default function JobsPage() {
 
   return (
     <div className="space-y-6 sm:space-y-8 max-w-5xl">
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 shadow-2xl max-w-sm w-full mx-4 text-center space-y-4">
+            <div className="w-16 h-16 mx-auto rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center animate-pulse">
+              <Brain className="w-8 h-8 text-primary-500 dark:text-primary-400 animate-spin" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                {locale === "th" ? "กำลังวิเคราะห์..." : "Analyzing..."}
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                {locale === "th"
+                  ? "AI กำลังวิเคราะห์รายละเอียดงาน อาจใช้เวลาสักครู่"
+                  : "AI is analyzing the job description. This may take a moment."}
+              </p>
+            </div>
+            <div className="flex items-center justify-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-primary-500 animate-bounce [animation-delay:-0.3s]" />
+              <div className="w-2 h-2 rounded-full bg-primary-500 animate-bounce [animation-delay:-0.15s]" />
+              <div className="w-2 h-2 rounded-full bg-primary-500 animate-bounce" />
+            </div>
+            <p className="text-xs text-slate-400 dark:text-slate-500">
+              {locale === "th"
+                ? "โมเดลกำลังประมวลผลข้อมูล..."
+                : "Model is processing data..."}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
           {locale === "th" ? "วิเคราะห์งาน" : "Job Analysis"}

@@ -31,6 +31,7 @@ export function Sidebar() {
     { label: t("nav.reskilling"), href: "/reskilling", icon: Sparkles },
     { label: t("nav.talent"), href: "/talent", icon: Users },
     { label: t("nav.analytics"), href: "/analytics", icon: BarChart3 },
+    { label: t("nav.insights"), href: "/insights", icon: BarChart3 },
     { label: t("nav.about"), href: "/about", icon: Info },
     { label: t("nav.document"), href: "/document", icon: FileText },
     { label: t("nav.settings"), href: "/settings", icon: Settings },
@@ -172,7 +173,7 @@ export function Sidebar() {
 
           {/* Bottom Card */}
           <div className="px-3 pb-4">
-            <Link href="/document" onClick={() => setIsOpen(false)}>
+            <Link href="/insights" onClick={() => setIsOpen(false)}>
               <div className="rounded-xl bg-gradient-to-br from-primary-500 to-emerald-500 p-4 text-white cursor-pointer hover:shadow-lg hover:shadow-primary-500/25 transition-all duration-300">
                 <h3 className="font-semibold text-sm">{t("sidebar.insights.title")}</h3>
                 <p className="text-xs text-white/80 mt-1">{t("sidebar.insights.desc")}</p>

@@ -1,5 +1,5 @@
 const OLLAMA_URL = process.env.OLLAMA_URL || "http://localhost:11434";
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen3:8b";
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen3:1.7b";
 
 interface FormData {
   jobTitle: string;
@@ -158,7 +158,7 @@ async function callOllama(prompt: string) {
         stream: false,
         options: {
           temperature: 0.3,
-          num_predict: 4096,
+          num_predict: 1024,
         },
       }),
       signal: controller.signal,

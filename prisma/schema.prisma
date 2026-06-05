@@ -1,5 +1,26 @@
+// ═══════════════════════════════════════════════════════════════════════════════
 // SkillShiftAI - Job Redesign & Reskilling Platform
 // Database Schema with PostgreSQL + pgvector support
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ─── pgvector Extension ────────────────────────────────────────────────────────
+// Run AFTER prisma db push to enable pgvector:
+//
+// CREATE EXTENSION IF NOT EXISTS vector;
+//
+// CREATE INDEX idx_master_skills_embedding
+// ON master_skills
+// USING hnsw (embedding vector_cosine_ops)
+// WITH (m = 16, ef_construction = 64);
+//
+// Example vector similarity query:
+// SELECT id, skill_name, category,
+//        1 - (embedding <=> $1::vector) AS similarity
+// FROM master_skills
+// WHERE embedding IS NOT NULL
+// ORDER BY embedding <=> $1::vector
+// LIMIT 10;
+// ═══════════════════════════════════════════════════════════════════════════════
 
 generator client {
   provider = "prisma-client-js"
@@ -10,129 +31,137 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ─── User Model ───────────────────────────────────────────────
+// ─── User Model ───────────────────────────────────────────────────────────────
 model User {
-  id             String        @id @default(uuid())
-  name           String
-  email          String        @unique
+  id              String        @id @default(uuid())
+  name            String
+  email           String        @unique
+  role            String        @default("employee") // admin, manager, employee
   currentJobTitle String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  userSkills     UserSkill[]
-  sessions       Session[]
+  department      String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  userSkills      UserSkill[]
+  sessions        Session[]
 
+  @@index([role])
+  @@index([department])
   @@map("users")
 }
 
-// ─── Master Skill Catalog ─────────────────────────────────────
+// ─── Master Skill Catalog ─────────────────────────────────────────────────────
 model MasterSkill {
   id          String      @id @default(uuid())
   skillName   String      @unique
-  category    String
+  category    String      // technical, soft, domain, management
   description String?
-  embedding   Unsupported("vector(1536)")? // pgvector: 1536 dimensions for OpenAI-compatible embeddings
+  embedding   Unsupported("vector(1536)")? // pgvector: 1536 dimensions
   createdAt   DateTime    @default(now())
   userSkills  UserSkill[]
   jobSkills   JobSkill[]
 
+  @@index([category])
   @@map("master_skills")
 }
 
-// ─── Job / Position ───────────────────────────────────────────
+// ─── Job / Position ───────────────────────────────────────────────────────────
 model Job {
-  id              String     @id @default(uuid())
+  id              String      @id @default(uuid())
   title           String
   description     String?
   department      String?
-  isRedesigned    Boolean    @default(false)
+  status          String      @default("active") // active, redesigned, archived
+  isRedesigned    Boolean     @default(false)
   parentJobId     String?
-  parentJob       Job?       @relation("JobHierarchy", fields: [parentJobId], references: [id])
-  childJobs       Job[]      @relation("JobHierarchy")
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  parentJob       Job?        @relation("JobHierarchy", fields: [parentJobId], references: [id])
+  childJobs       Job[]       @relation("JobHierarchy")
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
   tasks           JobTask[]
   jobSkills       JobSkill[]
+  analysisResults AnalysisResult[]
 
+  @@index([department])
+  @@index([status])
   @@map("jobs")
 }
 
-// ─── Job Task (atomic work items for redesign analysis) ───────
+// ─── Job Task (atomic work items for redesign analysis) ───────────────────────
 model JobTask {
-  id                String   @id @default(uuid())
-  jobId             String
-  job               Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  taskDescription   String
-  automationRiskScore Float  @default(0.0) // 0.0 - 1.0
-  impactLevel       String   @default("medium") // low, medium, high, critical
-  frequency         String?  // daily, weekly, monthly, ad-hoc
-  estimatedHours    Float?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                  String   @id @default(uuid())
+  jobId               String
+  job                 Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  taskDescription     String
+  automationRiskScore Float    @default(0.0) // 0.0 - 1.0
+  impactLevel         String   @default("medium") // low, medium, high, critical
+  frequency           String?  // daily, weekly, monthly, ad-hoc
+  estimatedHours      Float?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
+  @@index([jobId])
   @@map("job_tasks")
 }
 
-// ─── User Skill (proficiency mapping) ─────────────────────────
+// ─── User Skill (proficiency mapping) ─────────────────────────────────────────
 model UserSkill {
-  id              String   @id @default(uuid())
+  id              String      @id @default(uuid())
   userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   skillId         String
   skill           MasterSkill @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  proficiencyLevel Int     @default(1) // 1-5 scale
-  lastAssessedAt  DateTime @default(now())
-  createdAt       DateTime @default(now())
+  proficiencyLevel Int        @default(1) // 1-5 scale
+  lastAssessedAt  DateTime    @default(now())
+  createdAt       DateTime    @default(now())
 
   @@unique([userId, skillId])
+  @@index([userId])
+  @@index([skillId])
   @@map("user_skills")
 }
 
-// ─── Job-Skill relationship ───────────────────────────────────
+// ─── Job-Skill relationship ───────────────────────────────────────────────────
 model JobSkill {
-  id              String   @id @default(uuid())
+  id              String      @id @default(uuid())
   jobId           String
-  job             Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  job             Job         @relation(fields: [jobId], references: [id], onDelete: Cascade)
   skillId         String
   skill           MasterSkill @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  importanceLevel Int      @default(3) // 1-5 scale
-  createdAt       DateTime @default(now())
+  importanceLevel Int         @default(3) // 1-5 scale
+  createdAt       DateTime    @default(now())
 
   @@unique([jobId, skillId])
+  @@index([jobId])
+  @@index([skillId])
   @@map("job_skills")
 }
 
-// ─── Session (user activity tracking) ─────────────────────────
+// ─── Session (user activity tracking) ─────────────────────────────────────────
 model Session {
   id        String   @id @default(uuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   startedAt DateTime @default(now())
   endedAt   DateTime?
-  activity  Json?    // flexible JSON for session metadata
+  activity  Json?
 
+  @@index([userId])
   @@map("sessions")
 }
 
-// ═══════════════════════════════════════════════════════════════
-// pgvector Setup Instructions
-// ═══════════════════════════════════════════════════════════════
-// Run these SQL commands AFTER `prisma db push` to enable pgvector:
-//
-// 1. Enable the vector extension:
-//    CREATE EXTENSION IF NOT EXISTS vector;
-//
-// 2. Create HNSW index for fast similarity search on master_skills:
-//    CREATE INDEX idx_master_skills_embedding
-//    ON master_skills
-//    USING hnsw (embedding vector_cosine_ops)
-//    WITH (m = 16, ef_construction = 64);
-//
-// 3. Example vector similarity query:
-//    SELECT id, skill_name, category,
-//           1 - (embedding <=> $1::vector) AS similarity
-//    FROM master_skills
-//    WHERE embedding IS NOT NULL
-//    ORDER BY embedding <=> $1::vector
-//    LIMIT 10;
-//
-// You can run these via `prisma db execute` or directly in your database client.
+// ─── Analysis Result (AI analysis output from Jobs page) ──────────────────────
+model AnalysisResult {
+  id            String   @id @default(uuid())
+  jobId         String
+  job           Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  analysisType  String   // "job_analysis", "reskilling_recommendation", "skill_gap", "automation_impact"
+  input         Json     // raw input used for the analysis
+  output        Json     // structured AI output
+  model         String?  // which AI model was used
+  confidence    Float?   // 0.0 - 1.0
+  createdAt     DateTime @default(now())
+
+  @@index([jobId])
+  @@index([analysisType])
+  @@map("analysis_results")
+}
