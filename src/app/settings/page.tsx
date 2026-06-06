@@ -81,6 +81,14 @@ export default function SettingsPage() {
   const [expandedProvider, setExpandedProvider] = useState<string | null>(null);
   const [showApiKeys, setShowApiKeys] = useState<Record<string, boolean>>({});
   const [showDbUrl, setShowDbUrl] = useState(false);
+  const [dbEnabled, setDbEnabled] = useState(true);
+  const [dbStatus, setDbStatus] = useState<{
+    connected: boolean;
+    tables: Record<string, number>;
+    totalRecords: number;
+    message: string;
+  } | null>(null);
+  const [dbChecking, setDbChecking] = useState(false);
 
   // Check auth on mount
   useEffect(() => {
@@ -88,7 +96,39 @@ export default function SettingsPage() {
     if (isAuth === "true") {
       setAuthenticated(true);
     }
+    const dbPref = sessionStorage.getItem("skillshiftai_db_enabled");
+    if (dbPref !== null) {
+      setDbEnabled(dbPref !== "false");
+    }
   }, []);
+
+  // Check DB status when authenticated
+  useEffect(() => {
+    if (authenticated && dbEnabled) {
+      checkDbStatus();
+    }
+  }, [authenticated, dbEnabled]);
+
+  const checkDbStatus = async () => {
+    setDbChecking(true);
+    try {
+      const res = await fetch("/api/db-status");
+      const data = await res.json();
+      setDbStatus(data);
+    } catch {
+      setDbStatus({ connected: false, tables: {}, totalRecords: 0, message: "Failed to check" });
+    } finally {
+      setDbChecking(false);
+    }
+  };
+
+  const toggleDb = () => {
+    const next = !dbEnabled;
+    setDbEnabled(next);
+    sessionStorage.setItem("skillshiftai_db_enabled", String(next));
+    if (next) checkDbStatus();
+    else setDbStatus(null);
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -418,32 +458,103 @@ export default function SettingsPage() {
       </div>
 
       {/* ═══════════════════════════════════════════════════════ */}
-      {/* Database */}
+      {/* Database — Toggle + Monitor */}
       {/* ═══════════════════════════════════════════════════════ */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <Database className="w-5 h-5 text-emerald-500" />
-          <h2 className="font-semibold">{t("settings.database.title")}</h2>
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">PostgreSQL URL</label>
-          <div className="relative">
-            <input
-              type={showDbUrl ? "text" : "password"}
-              value={dbUrl}
-              onChange={(e) => setDbUrl(e.target.value)}
-              placeholder="postgresql://user:pass@localhost:5432/skillshiftai"
-              className="w-full px-4 py-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-            <button
-              type="button"
-              onClick={() => setShowDbUrl(!showDbUrl)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-            >
-              {showDbUrl ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <Database className="w-5 h-5 text-emerald-500" />
+            <h2 className="font-semibold">{t("settings.database.title")}</h2>
           </div>
+          <button
+            onClick={toggleDb}
+            className={`relative w-12 h-6 rounded-full transition-colors ${
+              dbEnabled ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"
+            }`}
+          >
+            <div
+              className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                dbEnabled ? "translate-x-6" : "translate-x-0.5"
+              }`}
+            />
+          </button>
         </div>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
+          {t("settings.database.desc")}
+        </p>
+
+        {dbEnabled && (
+          <div className="space-y-4">
+            {/* Connection Status */}
+            <div className={`flex items-center gap-3 p-3 rounded-xl border ${
+              dbStatus?.connected
+                ? "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800"
+                : dbChecking
+                ? "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800"
+                : "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800"
+            }`}>
+              <div className={`w-2.5 h-2.5 rounded-full ${
+                dbStatus?.connected ? "bg-emerald-500 animate-pulse" : dbChecking ? "bg-amber-500 animate-pulse" : "bg-red-500"
+              }`} />
+              <span className={`text-sm font-medium ${
+                dbStatus?.connected ? "text-emerald-700 dark:text-emerald-400" : dbChecking ? "text-amber-700 dark:text-amber-400" : "text-red-700 dark:text-red-400"
+              }`}>
+                {dbChecking
+                  ? "Checking connection..."
+                  : dbStatus?.connected
+                  ? t("settings.database.connected")
+                  : t("settings.database.disconnected")}
+              </span>
+              <button
+                onClick={checkDbStatus}
+                disabled={dbChecking}
+                className="ml-auto text-xs px-3 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+              >
+                {dbChecking ? <Loader2 className="w-3 h-3 animate-spin inline" /> : t("settings.database.test")}
+              </button>
+            </div>
+
+            {/* DATABASE_URL */}
+            <div>
+              <label className="block text-xs font-medium mb-1">DATABASE_URL (Neon PostgreSQL)</label>
+              <div className="relative">
+                <input
+                  type={showDbUrl ? "text" : "password"}
+                  value={dbUrl}
+                  onChange={(e) => setDbUrl(e.target.value)}
+                  placeholder="postgresql://user:pass@host/db?sslmode=require"
+                  className="w-full px-3 py-2 pr-10 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowDbUrl(!showDbUrl)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                >
+                  {showDbUrl ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Table Monitor */}
+            {dbStatus?.connected && dbStatus.tables && (
+              <div>
+                <p className="text-xs font-medium mb-2 text-slate-500 dark:text-slate-400">{t("settings.database.tables")}</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {Object.entries(dbStatus.tables).map(([table, count]) => (
+                    <div key={table} className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
+                      <p className="text-lg font-bold text-slate-900 dark:text-white">{(count as number).toLocaleString()}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{table}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <Activity className="w-3 h-3" />
+                  {t("settings.database.total")}: {dbStatus.totalRecords.toLocaleString()} {t("settings.database.records")}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ═══════════════════════════════════════════════════════ */}
