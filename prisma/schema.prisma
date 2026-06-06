@@ -43,6 +43,7 @@ model User {
   updatedAt       DateTime      @updatedAt
   userSkills      UserSkill[]
   sessions        Session[]
+  enrollments     UserEnrollment[]
 
   @@index([role])
   @@index([department])
@@ -59,6 +60,7 @@ model MasterSkill {
   createdAt   DateTime    @default(now())
   userSkills  UserSkill[]
   jobSkills   JobSkill[]
+  courses     Course[]
 
   @@index([category])
   @@map("master_skills")
@@ -164,4 +166,64 @@ model AnalysisResult {
   @@index([jobId])
   @@index([analysisType])
   @@map("analysis_results")
+}
+
+// ─── Course (AI Tools Training Course) ────────────────────────────────────────
+model Course {
+  id          String         @id @default(uuid())
+  title       String
+  description String?
+  skillId     String?
+  skill       MasterSkill?   @relation(fields: [skillId], references: [id], onDelete: SetNull)
+  thumbnail   String?
+  difficulty  String         @default("beginner") // beginner, intermediate, advanced
+  duration    Int?           // estimated minutes
+  isPublished Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  modules     CourseModule[]
+  enrollments UserEnrollment[]
+
+  @@index([skillId])
+  @@index([isPublished])
+  @@map("courses")
+}
+
+// ─── Course Module (lesson content within a course) ───────────────────────────
+model CourseModule {
+  id          String   @id @default(uuid())
+  courseId     String
+  course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  content     String?  // Markdown or HTML lesson content
+  aiToolType  String?  // typhoon, chatgpt, midjourney, ollama
+  sortOrder   Int      @default(0)
+  duration    Int?     // estimated minutes
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([courseId])
+  @@map("course_modules")
+}
+
+// ─── User Enrollment (training progress tracking) ─────────────────────────────
+model UserEnrollment {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId         String
+  course          Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  status          String   @default("ENROLLED") // ENROLLED, IN_PROGRESS, COMPLETED
+  progress        Float    @default(0) // 0.0 to 100.0
+  startedAt       DateTime @default(now())
+  completedAt     DateTime?
+  lastAccessedAt  DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@index([status])
+  @@map("user_enrollments")
 }

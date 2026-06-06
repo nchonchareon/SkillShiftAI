@@ -6,6 +6,7 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT = {
   api: 30,
   ai: 5,
+  aiSandbox: 10,
   windowMs: 60_000,
 };
 
@@ -20,7 +21,12 @@ function getRateLimit(ip: string, route: string) {
   }
 
   entry.count++;
-  const limit = route.startsWith("api/ai") ? RATE_LIMIT.ai : RATE_LIMIT.api;
+  let limit = RATE_LIMIT.api;
+  if (route.startsWith("api/training/sandbox") || route.startsWith("api/training/tutor")) {
+    limit = RATE_LIMIT.aiSandbox;
+  } else if (route.startsWith("api/ai")) {
+    limit = RATE_LIMIT.ai;
+  }
   return { allowed: entry.count <= limit, remaining: Math.max(0, limit - entry.count) };
 }
 

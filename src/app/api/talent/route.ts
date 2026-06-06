@@ -21,6 +21,9 @@ export async function GET(request: NextRequest) {
             : undefined,
           orderBy: { proficiencyLevel: "desc" },
         },
+        enrollments: {
+          select: { id: true, status: true, progress: true },
+        },
         _count: { select: { userSkills: true } },
       },
       orderBy: { name: "asc" },
@@ -48,6 +51,13 @@ export async function GET(request: NextRequest) {
             ? user.userSkills.reduce((sum, us) => sum + us.proficiencyLevel, 0) / user.userSkills.length
             : 0;
 
+        const totalEnrollments = user.enrollments.length;
+        const completedCourses = user.enrollments.filter((e) => e.status === "COMPLETED").length;
+        const avgProgress =
+          totalEnrollments > 0
+            ? user.enrollments.reduce((sum, e) => sum + e.progress, 0) / totalEnrollments
+            : 0;
+
         return {
           userId: user.id,
           name: user.name,
@@ -59,6 +69,11 @@ export async function GET(request: NextRequest) {
           topSkills,
           allSkills,
           averageProficiency: Math.round(avgProficiency * 100) / 100,
+          training: {
+            totalEnrollments,
+            completedCourses,
+            averageProgress: Math.round(avgProgress * 100) / 100,
+          },
         };
       });
 

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useLanguage } from "@/lib/i18n";
-import { Sparkles, ArrowRight, BookOpen, Target, TrendingUp, AlertTriangle, Loader2 } from "lucide-react";
+import { Sparkles, ArrowRight, BookOpen, Target, TrendingUp, AlertTriangle, Loader2, GraduationCap } from "lucide-react";
 
 interface WeakSkill {
   skillId: string;
@@ -31,6 +32,21 @@ interface ReskillingData {
   needsReskilling: ReskillingUser[];
 }
 
+interface CourseSkill {
+  id: string;
+  skillName: string;
+  category: string;
+}
+
+interface Course {
+  id: string;
+  title: string;
+  description: string | null;
+  difficulty: string;
+  skill: CourseSkill | null;
+  _count: { modules: number; enrollments: number };
+}
+
 const categoryColors: Record<string, string> = {
   technical: "from-blue-500 to-cyan-500",
   soft: "from-orange-500 to-yellow-500",
@@ -38,22 +54,38 @@ const categoryColors: Record<string, string> = {
   management: "from-purple-500 to-pink-500",
 };
 
+const difficultyColor: Record<string, string> = {
+  beginner: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  intermediate: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+  advanced: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+};
+
 export default function ReskillingPage() {
   const { locale } = useLanguage();
   const [data, setData] = useState<ReskillingData | null>(null);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/reskilling")
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.success) setData(json.data);
-        else setError(json.error || "Failed to load");
+    Promise.all([
+      fetch("/api/reskilling").then((r) => r.json()),
+      fetch("/api/training/courses").then((r) => r.json()),
+    ])
+      .then(([reskillingJson, coursesJson]) => {
+        if (reskillingJson.success) setData(reskillingJson.data);
+        else setError(reskillingJson.error || "Failed to load");
+        if (coursesJson.success) setCourses(coursesJson.data);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
+
+  const recommendedCourses = courses.filter((c) => {
+    if (!data?.needsReskilling) return false;
+    const weakSkillIds = data.needsReskilling.flatMap((u) => u.weakSkills.map((s) => s.skillId));
+    return c.skill && weakSkillIds.includes(c.skill.id);
+  });
 
   if (loading) {
     return (
@@ -83,7 +115,6 @@ export default function ReskillingPage() {
         </p>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { icon: Target, label: locale === "th" ? "พนักงานทั้งหมด" : "Total Employees", value: String(data.summary.totalUsers), color: "text-primary-500" },
@@ -101,7 +132,44 @@ export default function ReskillingPage() {
         })}
       </div>
 
-      {/* User Reskilling Cards */}
+      {recommendedCourses.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <GraduationCap className="w-5 h-5 text-primary-500" />
+            <h2 className="text-lg font-semibold">{locale === "th" ? "คอร์สเรียนที่แนะนำ" : "Recommended Courses"}</h2>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-slate-400 -mt-2">
+            {locale === "th" ? "คอร์สเรียนที่ตรงกับทักษะที่ต้องพัฒนา" : "Courses matched to your skill gaps"}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {recommendedCourses.map((course) => (
+              <Link key={course.id} href={`/training/${course.id}`}>
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 hover:shadow-lg hover:shadow-primary-500/10 transition-all duration-300 cursor-pointer group">
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-semibold group-hover:text-primary-500 transition-colors">{course.title}</h3>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${difficultyColor[course.difficulty] || difficultyColor.beginner}`}>
+                      {course.difficulty}
+                    </span>
+                  </div>
+                  {course.description && (
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-3 line-clamp-2">{course.description}</p>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-xs text-slate-400">
+                      <span className="flex items-center gap-1"><BookOpen className="w-3.5 h-3.5" /> {course._count.modules} modules</span>
+                      <span>{course._count.enrollments} students</span>
+                    </div>
+                    <span className="text-sm font-medium text-primary-500 flex items-center gap-1 group-hover:gap-2 transition-all">
+                      {locale === "th" ? "เริ่มเรียน" : "Start"} <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="space-y-4">
         {data.needsReskilling.length === 0 ? (
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 text-center">

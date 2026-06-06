@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -17,24 +17,36 @@ import {
   Info,
   Globe,
   FileText,
+  GraduationCap,
+  Database,
 } from "lucide-react";
 import { useLanguage, Locale } from "@/lib/i18n";
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAuth, setIsAuth] = useState(false);
   const pathname = usePathname();
   const { locale, setLocale, t } = useLanguage();
+
+  useEffect(() => {
+    const check = () => setIsAuth(sessionStorage.getItem("skillshiftai_auth") === "true");
+    check();
+    const id = setInterval(check, 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const navItems = [
     { label: t("nav.dashboard"), href: "/dashboard", icon: LayoutDashboard },
     { label: t("nav.jobs"), href: "/jobs", icon: Briefcase },
     { label: t("nav.reskilling"), href: "/reskilling", icon: Sparkles },
+    { label: t("nav.training"), href: "/training", icon: GraduationCap },
     { label: t("nav.talent"), href: "/talent", icon: Users },
     { label: t("nav.analytics"), href: "/analytics", icon: BarChart3 },
     { label: t("nav.insights"), href: "/insights", icon: BarChart3 },
     { label: t("nav.about"), href: "/about", icon: Info },
     { label: t("nav.document"), href: "/document", icon: FileText },
     { label: t("nav.settings"), href: "/settings", icon: Settings },
+    ...(isAuth ? [{ label: t("nav.sources"), href: "/settings/sources", icon: Database }] : []),
   ];
 
   const toggleLang = () => {

@@ -6,8 +6,9 @@ import { useLanguage } from "@/lib/i18n";
 import {
   Settings, Key, Database, Bell, Shield, CheckCircle2, AlertTriangle,
   Lock, Eye, EyeOff, Cpu, Cloud, Activity, BarChart3, Power, PowerOff,
-  Loader2, Zap
+  Loader2, Zap, Globe, ChevronRight
 } from "lucide-react";
+import Link from "next/link";
 
 interface AIProvider {
   id: string;
@@ -607,6 +608,24 @@ export default function SettingsPage() {
           ))}
         </div>
       </div>
+
+      {/* ═══════════════════════════════════════════════════════ */}
+      {/* Data Sources */}
+      {/* ═══════════════════════════════════════════════════════ */}
+      <Link href="/settings/sources">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 hover:border-primary-300 dark:hover:border-primary-700 transition-colors cursor-pointer group">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Globe className="w-5 h-5 text-blue-500" />
+              <div>
+                <h2 className="font-semibold">{t("sources.title")}</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t("sources.subtitle")}</p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-primary-500 transition-colors" />
+          </div>
+        </div>
+      </Link>
 
       {/* Save */}
       <div className="flex justify-end">

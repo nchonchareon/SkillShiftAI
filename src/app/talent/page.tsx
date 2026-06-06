@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/lib/i18n";
-import { Users, Search, Filter, Award, AlertTriangle, Loader2 } from "lucide-react";
+import { Users, Search, Filter, Award, AlertTriangle, Loader2, GraduationCap } from "lucide-react";
 
 interface TalentSkill {
   skillName: string;
@@ -21,6 +21,11 @@ interface TalentPerson {
   topSkills: TalentSkill[];
   allSkills: TalentSkill[];
   averageProficiency: number;
+  training: {
+    totalEnrollments: number;
+    completedCourses: number;
+    averageProgress: number;
+  };
 }
 
 interface TalentData {
@@ -129,13 +134,16 @@ export default function TalentPage() {
                 <th className="text-left px-5 py-3 font-medium text-slate-500 dark:text-slate-400">{locale === "th" ? "แผนก" : "Dept"}</th>
                 <th className="text-center px-5 py-3 font-medium text-slate-500 dark:text-slate-400">{locale === "th" ? "ทักษะ" : "Skills"}</th>
                 <th className="text-center px-5 py-3 font-medium text-slate-500 dark:text-slate-400">{locale === "th" ? "ระดับ" : "Avg"}</th>
+                <th className="text-center px-5 py-3 font-medium text-slate-500 dark:text-slate-400">
+                  <span className="flex items-center justify-center gap-1"><GraduationCap className="w-3.5 h-3.5" /> {locale === "th" ? "ฝึกอบรม" : "Training"}</span>
+                </th>
                 <th className="text-center px-5 py-3 font-medium text-slate-500 dark:text-slate-400">{locale === "th" ? "ความเสี่ยง" : "Risk"}</th>
               </tr>
             </thead>
             <tbody>
               {filteredTalent.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-5 py-8 text-center text-slate-400">
+                  <td colSpan={7} className="px-5 py-8 text-center text-slate-400">
                     {locale === "th" ? "ไม่พบข้อมูล" : "No data found"}
                   </td>
                 </tr>
@@ -151,6 +159,17 @@ export default function TalentPage() {
                         <span className="inline-flex items-center gap-1"><Award className="w-3.5 h-3.5 text-primary-500" /> {person.totalSkills}</span>
                       </td>
                       <td className="px-5 py-3.5 text-center font-semibold">{person.averageProficiency.toFixed(1)}</td>
+                      <td className="px-5 py-3.5 text-center">
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span className="text-xs text-slate-500">{person.training.completedCourses}/{person.training.totalEnrollments}</span>
+                          <div className="w-16 h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-gradient-to-r from-primary-500 to-emerald-500"
+                              style={{ width: `${person.training.averageProgress}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
                       <td className="px-5 py-3.5 text-center">
                         <span className={`px-2 py-0.5 rounded text-xs font-medium ${risk.color}`}>{risk.label}</span>
                       </td>

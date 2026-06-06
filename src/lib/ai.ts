@@ -268,7 +268,7 @@ async function generateJSON(prompt: string, provider?: string): Promise<any> {
   return callOllama(prompt);
 }
 
-async function generateText(prompt: string, provider?: string): Promise<string> {
+export async function generateText(prompt: string, provider?: string): Promise<string> {
   const p = resolveProvider(provider);
   if (p === "typhoon") {
     return callTyphoonFormat(prompt);
