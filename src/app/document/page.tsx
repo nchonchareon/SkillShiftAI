@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n";
-import { Download, FileText, Printer } from "lucide-react";
+import { Download } from "lucide-react";
 
 export default function DocumentPage() {
   const { t } = useLanguage();
@@ -31,155 +31,215 @@ export default function DocumentPage() {
         </button>
       </div>
 
-      {/* Document Content */}
-      <div className="doc-content bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-10">
-        {/* Title */}
-        <div className="text-center mb-10 pb-8 border-b border-slate-200 dark:border-slate-700">
-          <span className="inline-block bg-primary-100 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4">
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {/* SLIDE 1: Title */}
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      <div className="slide bg-gradient-to-br from-slate-900 via-slate-800 to-primary-900 rounded-2xl p-8 sm:p-12 text-white min-h-[500px] flex flex-col justify-center items-center text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyem0wLTRWMjhIMjR2Mmgxem0tMi0yYTEgMSAwIDEwMC0yIDAgMSAwIDAwMCAyek0zNCAyNGgtMnYyaDJ2LTJ6bS00IDB2Mmgydi0yaDN2LTJoLTN6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-40" />
+        <div className="relative z-10">
+          <span className="inline-block bg-white/10 backdrop-blur-sm text-white/90 px-5 py-2 rounded-full text-sm font-bold uppercase tracking-widest mb-6 border border-white/20">
             Strategic Implementation Document
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight">
-            AI-Powered Job Redesign & Reskilling Blueprint
-          </h2>
-          <p className="text-slate-500 dark:text-slate-400 text-base max-w-2xl mx-auto">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-6 tracking-tight leading-tight">
+            AI-Powered Job Redesign<br />& Reskilling Blueprint
+          </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto leading-relaxed">
             พิมพ์เขียวและแนวทางเชิงลึกในการพัฒนาฟังก์ชันป้อนข้อมูล (Input Optimization) เพื่อเพิ่มความแม่นยำในการวิเคราะห์ทักษะและยกระดับโครงสร้างบุคลากรด้วย AI
           </p>
+          <div className="flex items-center justify-center gap-8 mt-10">
+            <div className="text-center">
+              <p className="text-3xl font-bold">SkillShiftAI</p>
+              <p className="text-sm text-white/50">v1.0 — June 2026</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {/* SLIDE 2: ความเข้าใจระบบ */}
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      <div className="slide bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 sm:p-10 min-h-[500px]">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="w-10 h-10 rounded-xl bg-primary-500 text-white flex items-center justify-center text-lg font-bold">1</span>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">ความเข้าใจระบบ Job Redesign & Reskilling Platform</h2>
+        </div>
+        <p className="text-slate-600 dark:text-slate-300 mb-6 text-base leading-relaxed">
+          แพลตฟอร์มนี้ถูกออกแบบมาเพื่อช่วยองค์กรและพนักงานในการรับมือกับคลื่นความเปลี่ยนแปลงของปัญญาประดิษฐ์ (AI Automation) ผ่านการทำกิจกรรมหลัก 2 ประการ:
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-gradient-to-br from-primary-50 to-primary-100/50 dark:from-primary-950/30 dark:to-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-xl p-6">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-primary-500 text-white flex items-center justify-center text-sm font-bold">R</div>
+              <h3 className="font-bold text-primary-700 dark:text-primary-300 text-lg">Job Redesign</h3>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs font-semibold text-primary-600 dark:text-primary-400 mb-1">เป้าหมายหลัก</p>
+                <p className="text-sm text-slate-700 dark:text-slate-300">แยกแยะกิจกรรมงานเดิมที่ซ้ำซ้อนและมีความเสี่ยงโดนแทนที่ แล้วปรับเปลี่ยนหน้าที่ให้มุ่งเน้นงานที่สร้างมูลค่าสูง</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-primary-600 dark:text-primary-400 mb-1">บทบาทของ AI</p>
+                <p className="text-sm text-slate-700 dark:text-slate-300">ประเมิน Automation Risk Score ของแต่ละกิจกรรมย่อย และเสนอแนะโครงสร้าง Workflow ใหม่</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-6">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-sm font-bold">S</div>
+              <h3 className="font-bold text-emerald-700 dark:text-emerald-300 text-lg">Reskilling</h3>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-1">เป้าหมายหลัก</p>
+                <p className="text-sm text-slate-700 dark:text-slate-300">ค้นหาช่องว่างของทักษะ (Skill Gap) ระหว่างทักษะที่มีอยู่ กับทักษะที่จำเป็นในตำแหน่งงานใหม่</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-1">บทบาทของ AI</p>
+                <p className="text-sm text-slate-700 dark:text-slate-300">คำนวณเวกเตอร์ความคล้ายคลึง (Vector Similarity) เพื่อจับคู่และแนะนำคอร์สเรียน</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {/* SLIDE 3: Input Optimization */}
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      <div className="slide bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 sm:p-10 min-h-[500px]">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="w-10 h-10 rounded-xl bg-primary-500 text-white flex items-center justify-center text-lg font-bold">2</span>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">ความสำคัญของการปรับวิธีป้อนข้อมูล</h2>
         </div>
 
-        {/* Section 1 */}
-        <section className="mb-10">
-          <div className="bg-gradient-to-br from-primary-50 to-emerald-50 dark:from-primary-950/20 dark:to-emerald-950/20 border border-primary-200 dark:border-primary-800 rounded-xl p-6">
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-primary-500 text-white flex items-center justify-center text-sm font-bold">1</span>
-              ความเข้าใจระบบ Job Redesign & Reskilling Platform
-            </h3>
-            <p className="text-slate-600 dark:text-slate-300 mb-4">
-              แพลตฟอร์มนี้ถูกออกแบบมาเพื่อช่วยองค์กรและพนักงานในการรับมือกับคลื่นความเปลี่ยนแปลงของปัญญาประดิษฐ์ (AI Automation) ผ่านการทำกิจกรรมหลัก 2 ประการ:
-            </p>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-primary-200 dark:border-primary-800">
-                    <th className="text-left py-3 px-4 font-bold text-slate-900 dark:text-white w-1/4">แกนหลัก</th>
-                    <th className="text-left py-3 px-4 font-bold text-slate-900 dark:text-white">เป้าหมายหลัก</th>
-                    <th className="text-left py-3 px-4 font-bold text-slate-900 dark:text-white">บทบาทของ AI</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-slate-200 dark:border-slate-700">
-                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-white">Job Redesign</td>
-                    <td className="py-3 px-4 text-slate-600 dark:text-slate-300">แยกแยะกิจกรรมงานเดิมที่ซ้ำซ้อนและมีความเสี่ยงโดนแทนที่ แล้วปรับเปลี่ยนหน้าที่ให้มุ่งเน้นงานที่สร้างมูลค่าสูง</td>
-                    <td className="py-3 px-4 text-slate-600 dark:text-slate-300">ประเมิน Automation Risk Score ของแต่ละกิจกรรมย่อย และเสนอแนะโครงสร้าง Workflow ใหม่</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-white">Reskilling</td>
-                    <td className="py-3 px-4 text-slate-600 dark:text-slate-300">ค้นหาช่องว่างของทักษะ (Skill Gap) ระหว่างทักษะที่มีอยู่ กับทักษะที่จำเป็นในตำแหน่งงานใหม่</td>
-                    <td className="py-3 px-4 text-slate-600 dark:text-slate-300">คำนวณเวกเตอร์ความคล้ายคลึง (Vector Similarity) เพื่อจับคู่และแนะนำคอร์สเรียน</td>
-                  </tr>
-                </tbody>
-              </table>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Garbage In */}
+          <div className="bg-red-50 dark:bg-red-950/20 border-2 border-red-200 dark:border-red-800 rounded-xl p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-2xl">❌</span>
+              <h3 className="font-bold text-red-700 dark:text-red-400">แบบเดิม (Unstructured)</h3>
+            </div>
+            <div className="bg-white dark:bg-red-950/30 rounded-lg p-4 mb-4 border border-red-100 dark:border-red-900">
+              <p className="text-sm text-slate-600 dark:text-slate-300 italic">
+                &quot;ทำตำแหน่งธุรการบัญชี คีย์เอกสาร ใช้คอมพิวเตอร์เป็นหลัก&quot;
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-red-500 mt-0.5">→</span>
+              <p className="text-sm text-red-600 dark:text-red-400">วิเคราะห์ได้กว้างเกินไป ไม่สามารถจัดทำแผนพัฒนาได้</p>
             </div>
           </div>
-        </section>
 
-        {/* Section 2 & 3 */}
-        <section className="mb-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-              <span className="w-7 h-7 rounded-lg bg-primary-500 text-white flex items-center justify-center text-xs font-bold">2</span>
-              ความสำคัญของการปรับวิธีป้อนข้อมูล
-            </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">
-              การใช้กล่องข้อความขนาดใหญ่เพียงช่องเดียวมักสร้างปัญหา <strong>&quot;Garbage In, Garbage Out&quot;</strong> เนื่องจากผู้ใช้งานมักกรอกข้อมูลที่ตื้นเกินไป
-            </p>
-            <p className="text-sm text-slate-600 dark:text-slate-300">
-              การเปลี่ยนไปเป็น <strong>&quot;Guided Structured Input&quot;</strong> จะทำให้ AI วิเคราะห์ได้อย่างแม่นยำขึ้นกว่า 85%
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-              <span className="w-7 h-7 rounded-lg bg-primary-500 text-white flex items-center justify-center text-xs font-bold">3</span>
-              การเปรียบเทียบรูปแบบข้อมูลนำเข้า
-            </h3>
-            <div className="space-y-3">
-              <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
-                <p className="text-xs font-bold text-red-600 dark:text-red-400 mb-1">❌ แบบเดิม (Unstructured)</p>
-                <p className="text-xs text-slate-600 dark:text-slate-400 italic">&quot;ทำตำแหน่งธุรการบัญชี คีย์เอกสาร ใช้คอมพิวเตอร์เป็นหลัก&quot;</p>
-                <p className="text-xs text-red-500 dark:text-red-400 mt-1">→ วิเคราะห์ได้กว้างเกินไป ไม่สามารถจัดทำแผนพัฒนาได้</p>
-              </div>
-              <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-3">
-                <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-1">✅ แบบใหม่ (Guided Input)</p>
-                <p className="text-xs text-slate-600 dark:text-slate-400"><strong>ตำแหน่ง:</strong> ธุรการบัญชี | <strong>ภารกิจ:</strong> คีย์ข้อมูล Invoice ลง ERP | <strong>เครื่องมือ:</strong> Excel, SAP</p>
-                <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">→ แตกภารกิจ ประเมินความเสี่ยง แนะนำคอร์สเรียนได้ทันที</p>
-              </div>
+          {/* Guided Input */}
+          <div className="bg-emerald-50 dark:bg-emerald-950/20 border-2 border-emerald-200 dark:border-emerald-800 rounded-xl p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-2xl">✅</span>
+              <h3 className="font-bold text-emerald-700 dark:text-emerald-400">แบบใหม่ (Guided Input)</h3>
+            </div>
+            <div className="bg-white dark:bg-emerald-950/30 rounded-lg p-4 mb-4 border border-emerald-100 dark:border-emerald-900">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
+                <strong>ตำแหน่ง:</strong> ธุรการบัญชี<br />
+                <strong>ภารกิจ:</strong> คีย์ข้อมูล Invoice ลง ERP<br />
+                <strong>เครื่องมือ:</strong> Excel, SAP
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-emerald-500 mt-0.5">→</span>
+              <p className="text-sm text-emerald-600 dark:text-emerald-400">แตกภารกิจ ประเมินความเสี่ยง แนะนำคอร์สเรียนได้ทันที</p>
             </div>
           </div>
-        </section>
+        </div>
 
-        {/* Section 4 - 4 Categories */}
-        <section className="mb-10">
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
-            <span className="w-8 h-8 rounded-lg bg-primary-500 text-white flex items-center justify-center text-sm font-bold">4</span>
-            โครงสร้างข้อมูล 4 หมวดสำคัญสำหรับการวิเคราะห์
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[
-              { num: "1", title: "Core Tasks & Daily Activities", desc: "ระบุกิจกรรมที่ทำเป็นประจำอย่างเจาะจง ยิ่งละเอียด AI ประเมิน Automation Risk Score ได้ดียิ่งขึ้น", color: "primary" },
-              { num: "2", title: "Current Tools & Technology", desc: "ระบุชื่อซอฟต์แวร์หรือเครื่องมือที่ใช้ (Excel, SAP, Salesforce) นำไปค้นหาทักษะเทคโนโลยีที่เกี่ยวข้อง", color: "violet" },
-              { num: "3", title: "Existing Skills & Proficiency", desc: "ทักษะ Hard Skills และ Soft Skills ที่มีอยู่เดิม เพื่อตั้งค่าเป็น Baseline Skills", color: "emerald" },
-              { num: "4", title: "Future Goals & Desired Pathway", desc: "เป้าหมายการเติบโต เช่น ต้องการลดงานแมนนวล 50% หรือพัฒนาไปเป็นนักวิเคราะห์เชิงกลยุทธ์", color: "amber" },
-            ].map((item) => (
-              <div key={item.num} className="flex gap-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
-                <div className="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 flex items-center justify-center font-bold text-sm shrink-0">
-                  {item.num}
+        <div className="mt-6 p-4 bg-primary-50 dark:bg-primary-950/20 border border-primary-200 dark:border-primary-800 rounded-xl">
+          <p className="text-sm text-primary-700 dark:text-primary-300 text-center font-medium">
+            การเปลี่ยนไปเป็น &quot;Guided Structured Input&quot; จะทำให้ AI วิเคราะห์ได้อย่างแม่นยำขึ้นกว่า <span className="text-lg font-bold">85%</span>
+          </p>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {/* SLIDE 4: 4 Categories */}
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      <div className="slide bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 sm:p-10 min-h-[500px]">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="w-10 h-10 rounded-xl bg-primary-500 text-white flex items-center justify-center text-lg font-bold">3</span>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">โครงสร้างข้อมูล 4 หมวดสำคัญสำหรับการวิเคราะห์</h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[
+            { num: "1", title: "Core Tasks & Daily Activities", desc: "ระบุกิจกรรมที่ทำเป็นประจำอย่างเจาะจง ยิ่งละเอียด AI ประเมิน Automation Risk Score ได้ดียิ่งขึ้น", color: "from-primary-500 to-primary-600", icon: "📋" },
+            { num: "2", title: "Current Tools & Technology", desc: "ระบุชื่อซอฟต์แวร์หรือเครื่องมือที่ใช้ (Excel, SAP, Salesforce) นำไปค้นหาทักษะเทคโนโลยีที่เกี่ยวข้อง", color: "from-violet-500 to-violet-600", icon: "🛠️" },
+            { num: "3", title: "Existing Skills & Proficiency", desc: "ทักษะ Hard Skills และ Soft Skills ที่มีอยู่เดิม เพื่อตั้งค่าเป็น Baseline Skills", color: "from-emerald-500 to-emerald-600", icon: "📊" },
+            { num: "4", title: "Future Goals & Desired Pathway", desc: "เป้าหมายการเติบโต เช่น ต้องการลดงานแมนนวล 50% หรือพัฒนาไปเป็นนักวิเคราะห์เชิงกลยุทธ์", color: "from-amber-500 to-amber-600", icon: "🎯" },
+          ].map((item) => (
+            <div key={item.num} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-5 hover:shadow-md transition-shadow">
+              <div className="flex items-start gap-4">
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center text-xl shrink-0 shadow-lg`}>
+                  {item.icon}
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">{item.title}</h4>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs font-bold text-slate-400">#{item.num}</span>
+                    <h3 className="font-bold text-slate-900 dark:text-white text-sm">{item.title}</h3>
+                  </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
+            </div>
+          ))}
+        </div>
+      </div>
 
-        {/* Section 5 - AI Output Example */}
-        <section className="mb-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-              <span className="w-7 h-7 rounded-lg bg-primary-500 text-white flex items-center justify-center text-xs font-bold">5</span>
-              จำลองผลการวิเคราะห์งาน
-            </h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">ตัวอย่างการประเมินตำแหน่ง &quot;ธุรการบัญชีและเอกสาร&quot;</p>
-            <div className="space-y-2">
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {/* SLIDE 5: AI Output + JSON Schema */}
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      <div className="slide bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 sm:p-10 min-h-[500px]">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="w-10 h-10 rounded-xl bg-primary-500 text-white flex items-center justify-center text-lg font-bold">4</span>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">ตัวอย่างผลการวิเคราะห์งาน</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Risk Assessment */}
+          <div>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">ตำแหน่ง &quot;ธุรการบัญชีและเอกสาร&quot;</p>
+            <div className="space-y-3">
               {[
-                { task: "คีย์ข้อมูล Invoice ลงระบบ ERP", risk: "0.92", level: "High", color: "red" },
-                { task: "จัดทำรายงานสรุปยอดรายจ่ายด้วย Excel", risk: "0.75", level: "Medium", color: "amber" },
-                { task: "ประสานงาน/ตอบคำถามเรื่องจ่ายเงิน", risk: "0.35", level: "Low", color: "emerald" },
+                { task: "คีย์ข้อมูล Invoice ลงระบบ ERP", risk: "0.92", level: "High", color: "red", pct: 92 },
+                { task: "จัดทำรายงานสรุปยอดรายจ่ายด้วย Excel", risk: "0.75", level: "Medium", color: "amber", pct: 75 },
+                { task: "ประสานงาน/ตอบคำถามเรื่องจ่ายเงิน", risk: "0.35", level: "Low", color: "emerald", pct: 35 },
               ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between py-2 px-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
-                  <span className="text-sm text-slate-700 dark:text-slate-300">{item.task}</span>
-                  <div className="flex items-center gap-2 shrink-0 ml-3">
-                    <span className={`text-sm font-bold ${
-                      item.color === "red" ? "text-red-500" : item.color === "amber" ? "text-amber-500" : "text-emerald-500"
-                    }`}>{item.risk}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded font-medium ${
-                      item.color === "red" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" :
-                      item.color === "amber" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" :
-                      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                    }`}>{item.level}</span>
+                <div key={i} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{item.task}</span>
+                    <div className="flex items-center gap-2 shrink-0 ml-3">
+                      <span className={`text-lg font-bold ${
+                        item.color === "red" ? "text-red-500" : item.color === "amber" ? "text-amber-500" : "text-emerald-500"
+                      }`}>{item.risk}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded font-medium ${
+                        item.color === "red" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" :
+                        item.color === "amber" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" :
+                        "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                      }`}>{item.level}</span>
+                    </div>
+                  </div>
+                  <div className="h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${
+                        item.color === "red" ? "bg-red-500" : item.color === "amber" ? "bg-amber-500" : "bg-emerald-500"
+                      }`}
+                      style={{ width: `${item.pct}%` }}
+                    />
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-              <span className="w-7 h-7 rounded-lg bg-primary-500 text-white flex items-center justify-center text-xs font-bold">6</span>
-              JSON Schema ที่คืนกลับ
-            </h3>
-            <pre className="bg-slate-900 dark:bg-black text-emerald-400 p-4 rounded-lg text-xs overflow-x-auto border border-slate-700 dark:border-slate-600">
+          {/* JSON Schema */}
+          <div>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">JSON Schema ที่คืนกลับ</p>
+            <pre className="bg-slate-900 dark:bg-black text-emerald-400 p-5 rounded-xl text-xs overflow-x-auto border border-slate-700 dark:border-slate-600 leading-relaxed h-[340px]">
 {`{
   "job_redesign": {
     "new_job_title": "Strategic Account Analyst",
@@ -201,37 +261,42 @@ export default function DocumentPage() {
 }`}
             </pre>
           </div>
-        </section>
+        </div>
+      </div>
 
-        {/* Tech Stack */}
-        <section className="mb-10">
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
-            <span className="w-8 h-8 rounded-lg bg-primary-500 text-white flex items-center justify-center text-sm font-bold">7</span>
-            Technology Stack
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { label: "Frontend", items: "Next.js 14, TypeScript, Tailwind CSS, Recharts, Lucide React" },
-              { label: "Backend", items: "Next.js API Routes, Prisma ORM" },
-              { label: "Database", items: "PostgreSQL (Vector Search)" },
-              { label: "AI Engine", items: "Ollama + Qwen3 8B (Free, Local)" },
-            ].map((item) => (
-              <div key={item.label} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-                <h4 className="font-bold text-primary-600 dark:text-primary-400 text-sm mb-2">{item.label}</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{item.items}</p>
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {/* SLIDE 6: Tech Stack + Footer */}
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      <div className="slide bg-gradient-to-br from-slate-900 via-slate-800 to-primary-900 rounded-2xl p-8 sm:p-10 text-white min-h-[500px]">
+        <div className="flex items-center gap-3 mb-8">
+          <span className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-lg font-bold">5</span>
+          <h2 className="text-2xl font-bold">Technology Stack</h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          {[
+            { label: "Frontend", items: "Next.js 14, TypeScript, Tailwind CSS, Recharts, Lucide React", color: "from-blue-500 to-cyan-500" },
+            { label: "Backend", items: "Next.js API Routes, Prisma ORM", color: "from-emerald-500 to-teal-500" },
+            { label: "Database", items: "PostgreSQL + pgvector", color: "from-violet-500 to-purple-500" },
+            { label: "AI Engine", items: "Typhoon Thai AI + Ollama", color: "from-amber-500 to-orange-500" },
+          ].map((item) => (
+            <div key={item.label} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-5">
+              <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center mb-3`}>
+                <span className="text-white text-xs font-bold">{item.label.substring(0, 2)}</span>
               </div>
-            ))}
-          </div>
-        </section>
+              <h4 className="font-bold text-white text-sm mb-1">{item.label}</h4>
+              <p className="text-xs text-white/60 leading-relaxed">{item.items}</p>
+            </div>
+          ))}
+        </div>
 
         {/* Footer */}
-        <div className="text-center pt-8 border-t border-slate-200 dark:border-slate-700">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+        <div className="text-center pt-8 border-t border-white/10">
+          <p className="text-sm text-white/40">
             © 2026 SkillShiftAI — AI-Powered Job Redesign & Reskilling Platform. All rights reserved.
           </p>
         </div>
       </div>
-
     </div>
   );
 }
