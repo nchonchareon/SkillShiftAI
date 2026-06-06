@@ -15,17 +15,14 @@
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
-    "bcryptjs": "^3.0.3",
     "html2pdf.js": "^0.14.0",
     "lucide-react": "^0.460.0",
     "next": "^15.5.19",
-    "next-auth": "^5.0.0-beta.31",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "recharts": "^2.13.3"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.9.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",

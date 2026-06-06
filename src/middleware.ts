@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { auth } from "@/lib/auth";
 
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
@@ -25,26 +24,17 @@ function getRateLimit(ip: string, route: string) {
   return { allowed: entry.count <= limit, remaining: Math.max(0, limit - entry.count) };
 }
 
-const PUBLIC_PATHS = ["/", "/login", "/register", "/dashboard", "/about", "/document"];
-const PUBLIC_API = ["/api/auth"];
+const PUBLIC_PATHS = ["/", "/login", "/dashboard", "/about", "/document", "/_next", "/favicon.ico"];
 
-export default auth((req) => {
-  const { pathname } = req.nextUrl;
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-  if (PUBLIC_PATHS.some((p) => pathname === p) || pathname.startsWith("/_next")) {
-    return NextResponse.next();
-  }
-
-  if (PUBLIC_API.some((p) => pathname.startsWith(p))) {
+  if (PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith("/_next"))) {
     return NextResponse.next();
   }
 
   if (pathname.startsWith("/api/")) {
-    if (!req.auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
+    const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown";
     const route = pathname.replace("/api/", "api/");
     const { allowed, remaining } = getRateLimit(ip, route);
 
@@ -60,14 +50,8 @@ export default auth((req) => {
     return response;
   }
 
-  if (!req.auth) {
-    const loginUrl = new URL("/login", req.nextUrl.origin);
-    loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],

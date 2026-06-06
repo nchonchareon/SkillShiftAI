@@ -1,9 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
-
-const PASSWORD_HASH = bcrypt.hashSync("password123", 10);
 
 async function main() {
   console.log("🌱 Seeding database...\n");
@@ -15,7 +12,6 @@ async function main() {
         id: "user-001",
         name: "สมชาย ใจดี",
         email: "somchai@skillshiftai.com",
-        passwordHash: PASSWORD_HASH,
         role: "admin",
         currentJobTitle: "Chief Technology Officer",
         department: "Technology",
@@ -26,7 +22,6 @@ async function main() {
         id: "user-002",
         name: "สมหญิง รักงาน",
         email: "somying@skillshiftai.com",
-        passwordHash: PASSWORD_HASH,
         role: "manager",
         currentJobTitle: "HR Manager",
         department: "Human Resources",
@@ -37,7 +32,6 @@ async function main() {
         id: "user-003",
         name: "วิชัย เก่งมาก",
         email: "wichai@skillshiftai.com",
-        passwordHash: PASSWORD_HASH,
         role: "employee",
         currentJobTitle: "Data Analyst",
         department: "Analytics",
@@ -48,7 +42,6 @@ async function main() {
         id: "user-004",
         name: "พิมพ์ใจ สดใส",
         email: "pimjai@skillshiftai.com",
-        passwordHash: PASSWORD_HASH,
         role: "employee",
         currentJobTitle: "Marketing Specialist",
         department: "Marketing",
@@ -59,7 +52,6 @@ async function main() {
         id: "user-005",
         name: "ธนกร ชาญฉลาด",
         email: "tanakorn@skillshiftai.com",
-        passwordHash: PASSWORD_HASH,
         role: "manager",
         currentJobTitle: "IT Support Lead",
         department: "Technology",

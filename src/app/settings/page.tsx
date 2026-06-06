@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/i18n";
 import {
   Settings, Key, Database, Bell, Shield, CheckCircle2, AlertTriangle,
   Lock, Eye, EyeOff, Cpu, Cloud, Activity, BarChart3, Power, PowerOff,
-  Loader2, Zap, Plus, X, Trash2
+  Loader2, Zap
 } from "lucide-react";
 
 interface AIProvider {
@@ -67,8 +67,13 @@ const defaultProviders: AIProvider[] = [
 
 export default function SettingsPage() {
   const { t } = useLanguage();
-  const { data: session, status } = useSession();
-  const authenticated = status === "authenticated";
+  const router = useRouter();
+  const [authenticated, setAuthenticated] = useState(false);
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState("");
+  const [loggingIn, setLoggingIn] = useState(false);
 
   const [providers, setProviders] = useState<AIProvider[]>(defaultProviders);
   const [dbUrl, setDbUrl] = useState("");
@@ -85,11 +90,13 @@ export default function SettingsPage() {
   } | null>(null);
   const [dbChecking, setDbChecking] = useState(false);
   const [activeProvider, setActiveProvider] = useState("typhoon");
-  const [showAddProvider, setShowAddProvider] = useState(false);
-  const [newProvider, setNewProvider] = useState({ name: "", endpoint: "", model: "", apiKey: "" });
 
-  // Load preferences on mount
+  // Check auth on mount
   useEffect(() => {
+    const isAuth = sessionStorage.getItem("skillshiftai_auth");
+    if (isAuth === "true") {
+      setAuthenticated(true);
+    }
     const dbPref = sessionStorage.getItem("skillshiftai_db_enabled");
     if (dbPref !== null) {
       setDbEnabled(dbPref !== "false");
@@ -128,9 +135,27 @@ export default function SettingsPage() {
     else setDbStatus(null);
   };
 
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError("");
+    if (!loginEmail || !loginPassword) {
+      setLoginError(t("settings.login.error"));
+      return;
+    }
+    setLoggingIn(true);
+    setTimeout(() => {
+      sessionStorage.setItem("skillshiftai_auth", "true");
+      sessionStorage.setItem("skillshiftai_user", loginEmail);
+      setAuthenticated(true);
+      setLoggingIn(false);
+    }, 800);
+  };
+
   const handleLogout = () => {
+    sessionStorage.removeItem("skillshiftai_auth");
+    sessionStorage.removeItem("skillshiftai_user");
     sessionStorage.removeItem("skillshiftai_db_enabled");
-    signOut({ callbackUrl: "/login" });
+    setAuthenticated(false);
   };
 
   const toggleProvider = (id: string) => {
@@ -168,46 +193,74 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 3000);
   };
 
-  const addCustomProvider = () => {
-    if (!newProvider.name || !newProvider.endpoint || !newProvider.model) return;
-    const id = `custom-${Date.now()}`;
-    setProviders((prev) => [
-      ...prev,
-      {
-        id,
-        name: newProvider.name,
-        description: `Custom provider — ${newProvider.endpoint}`,
-        icon: "🔧",
-        enabled: true,
-        apiKey: newProvider.apiKey,
-        model: newProvider.model,
-        endpoint: newProvider.endpoint,
-        tokensUsed: 0,
-        tokensLimit: 0,
-        status: "active" as const,
-      },
-    ]);
-    setNewProvider({ name: "", endpoint: "", model: "", apiKey: "" });
-    setShowAddProvider(false);
-  };
-
-  const removeCustomProvider = (id: string) => {
-    setProviders((prev) => prev.filter((p) => p.id !== id));
-    if (activeProvider === id) {
-      setActiveProvider("typhoon");
-      localStorage.setItem("skillshiftai_active_provider", "typhoon");
-    }
-  };
-
   // ═══════════════════════════════════════════════════════════
-  // LOADING STATE
+  // LOGIN FORM
   // ═══════════════════════════════════════════════════════════
-  if (status === "loading") {
+  if (!authenticated) {
     return (
       <div className="flex items-center justify-center min-h-[600px]">
-        <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">
-          <Loader2 className="w-5 h-5 animate-spin" />
-          <span className="text-sm">Loading...</span>
+        <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-emerald-500 flex items-center justify-center">
+              <Lock className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h2 className="font-bold text-lg">{t("settings.login.title")}</h2>
+              <p className="text-xs text-slate-500">{t("settings.login.subtitle")}</p>
+            </div>
+          </div>
+
+          {loginError && (
+            <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
+              {loginError}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">{t("settings.login.email")}</label>
+              <input
+                type="email"
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                placeholder="admin@company.com"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">{t("settings.login.password")}</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={loggingIn}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold py-2.5 rounded-xl hover:shadow-lg hover:shadow-primary-500/25 transition-all disabled:opacity-50"
+            >
+              {loggingIn ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <Lock className="w-4 h-4" />
+                  {t("settings.login.btn")}
+                </>
+              )}
+            </button>
+          </form>
         </div>
       </div>
     );
@@ -221,14 +274,10 @@ export default function SettingsPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t("settings.title")}</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
-            {session?.user?.email && (
-              <span className="text-primary-500 font-medium">{session.user.email}</span>
-            )}
-          </p>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">{t("settings.subtitle")}</p>
         </div>
         <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
+          onClick={handleLogout}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
         >
           <PowerOff className="w-4 h-4" />
@@ -293,14 +342,6 @@ export default function SettingsPage() {
                       className="text-xs px-3 py-1.5 rounded-lg bg-primary-500 text-white hover:bg-primary-600 transition-colors font-medium"
                     >
                       {t("settings.aiProviders.use")}
-                    </button>
-                  )}
-                  {provider.id.startsWith("custom-") && (
-                    <button
-                      onClick={() => removeCustomProvider(provider.id)}
-                      className="p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   )}
                   <button
@@ -403,87 +444,7 @@ export default function SettingsPage() {
             </div>
           ))}
         </div>
-
-        {/* Add Provider Button */}
-        <button
-          onClick={() => setShowAddProvider(true)}
-          className="mt-4 flex items-center gap-2 text-sm text-primary-500 hover:text-primary-600 font-medium transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          {t("settings.aiProviders.addCustom")}
-        </button>
       </div>
-
-      {/* Add Provider Modal */}
-      {showAddProvider && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 w-full max-w-md">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="font-semibold">{t("settings.aiProviders.addCustom")}</h3>
-              <button onClick={() => setShowAddProvider(false)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">{t("settings.aiProviders.name")}</label>
-                <input
-                  type="text"
-                  value={newProvider.name}
-                  onChange={(e) => setNewProvider({ ...newProvider, name: e.target.value })}
-                  placeholder="My Custom AI"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">{t("settings.aiProviders.endpoint")}</label>
-                <input
-                  type="text"
-                  value={newProvider.endpoint}
-                  onChange={(e) => setNewProvider({ ...newProvider, endpoint: e.target.value })}
-                  placeholder="https://api.example.com/v1"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">{t("settings.aiProviders.model")}</label>
-                <input
-                  type="text"
-                  value={newProvider.model}
-                  onChange={(e) => setNewProvider({ ...newProvider, model: e.target.value })}
-                  placeholder="model-name"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">{t("settings.aiProviders.apiKey")}</label>
-                <input
-                  type="password"
-                  value={newProvider.apiKey}
-                  onChange={(e) => setNewProvider({ ...newProvider, apiKey: e.target.value })}
-                  placeholder="sk-..."
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => setShowAddProvider(false)}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-                >
-                  {t("common.cancel")}
-                </button>
-                <button
-                  onClick={addCustomProvider}
-                  disabled={!newProvider.name || !newProvider.endpoint || !newProvider.model}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-semibold hover:shadow-lg hover:shadow-primary-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {t("common.add")}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ═══════════════════════════════════════════════════════ */}
       {/* Token Usage Summary */}
