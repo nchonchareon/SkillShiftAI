@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { analyzeJobDescription, analyzeStructuredJob, formatRawText } from "@/lib/ai";
+import { analyzeJobDescription, analyzeStructuredJob, formatRawText, getAIProvider } from "@/lib/ai";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
         );
       }
       const formatted = await formatRawText(jobDescription);
-      return NextResponse.json({ success: true, formatted });
+      return NextResponse.json({ success: true, formatted, provider: getAIProvider() });
     }
 
     // Handle structured form data
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
         tools: tools || "",
         skills: skills || "",
       });
-      return NextResponse.json({ success: true, data: analysis });
+      return NextResponse.json({ success: true, data: analysis, provider: getAIProvider() });
     }
 
     // Handle raw job description text
@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: analysis,
+      provider: getAIProvider(),
     });
   } catch (error: any) {
     console.error("[AI Analyze Error]", error);
