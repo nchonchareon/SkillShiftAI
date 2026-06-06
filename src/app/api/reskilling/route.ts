@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not configured" }, { status: 503 });
+    }
+
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
 
@@ -55,7 +59,6 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Return all users with aggregated skill data
     const users = await prisma.user.findMany({
       include: {
         userSkills: {

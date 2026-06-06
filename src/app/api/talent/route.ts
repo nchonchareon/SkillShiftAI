@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not configured" }, { status: 503 });
+    }
+
     const { searchParams } = new URL(request.url);
     const skillFilter = searchParams.get("skill");
     const minProficiency = parseInt(searchParams.get("minProficiency") || "1");
@@ -57,7 +61,6 @@ export async function GET(request: NextRequest) {
         };
       });
 
-    // Aggregate stats
     const categoryBreakdown: Record<string, number> = {};
     for (const person of talentPool) {
       for (const skill of person.allSkills) {

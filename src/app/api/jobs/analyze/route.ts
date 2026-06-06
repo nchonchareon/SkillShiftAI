@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not configured" }, { status: 503 });
+    }
+
     const body = await request.json();
     const { jobId, analysisType, input, output, model, confidence } = body;
 
