@@ -79,6 +79,8 @@ export default function SettingsPage() {
   const [dbUrl, setDbUrl] = useState("");
   const [saved, setSaved] = useState(false);
   const [expandedProvider, setExpandedProvider] = useState<string | null>(null);
+  const [showApiKeys, setShowApiKeys] = useState<Record<string, boolean>>({});
+  const [showDbUrl, setShowDbUrl] = useState(false);
 
   // Check auth on mount
   useEffect(() => {
@@ -318,14 +320,25 @@ export default function SettingsPage() {
                 <div className="px-4 pb-4 space-y-3 border-t border-slate-200 dark:border-slate-700 pt-3">
                   <div>
                     <label className="block text-xs font-medium mb-1">{t("settings.aiProviders.apiKey")}</label>
-                    <input
-                      type="password"
-                      value={provider.apiKey}
-                      onChange={(e) => updateProviderKey(provider.id, e.target.value)}
-                      placeholder={provider.id === "ollama" ? "No key needed" : "sk-..."}
-                      disabled={provider.id === "ollama"}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showApiKeys[provider.id] ? "text" : "password"}
+                        value={provider.apiKey}
+                        onChange={(e) => updateProviderKey(provider.id, e.target.value)}
+                        placeholder={provider.id === "ollama" ? "No key needed" : "sk-..."}
+                        disabled={provider.id === "ollama"}
+                        className="w-full px-3 py-2 pr-10 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50"
+                      />
+                      {provider.id !== "ollama" && (
+                        <button
+                          type="button"
+                          onClick={() => setShowApiKeys(prev => ({ ...prev, [provider.id]: !prev[provider.id] }))}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                        >
+                          {showApiKeys[provider.id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -414,13 +427,22 @@ export default function SettingsPage() {
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">PostgreSQL URL</label>
-          <input
-            type="password"
-            value={dbUrl}
-            onChange={(e) => setDbUrl(e.target.value)}
-            placeholder="postgresql://user:pass@localhost:5432/skillshiftai"
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-          />
+          <div className="relative">
+            <input
+              type={showDbUrl ? "text" : "password"}
+              value={dbUrl}
+              onChange={(e) => setDbUrl(e.target.value)}
+              placeholder="postgresql://user:pass@localhost:5432/skillshiftai"
+              className="w-full px-4 py-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+            <button
+              type="button"
+              onClick={() => setShowDbUrl(!showDbUrl)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+            >
+              {showDbUrl ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
       </div>
 
