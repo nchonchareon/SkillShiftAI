@@ -224,6 +224,23 @@ export const translations = {
     "insights.strategy.s3.desc": "พัฒนาระบบฐานข้อมูลทักษะบุคลากรแบบ Real-time เพื่อใช้ในการวางแผนและตัดสินใจเชิงกลยุทธ์",
     "insights.strategy.s4.title": "ติดตามและวัดผลอย่างต่อเนื่อง",
     "insights.strategy.s4.desc": "กำหนด KPI สำหรับการพัฒนาทักษะและติดตามความคืบหน้ารายเดือน เพื่อปรับปรุงแผนการฝึกอบรมอย่างเหมาะสม",
+
+    // Settings
+    "settings.title": "ตั้งค่า",
+    "settings.subtitle": "จัดการการตั้งค่าระบบและการเชื่อมต่อ",
+    "settings.saved": "บันทึกเรียบร้อยแล้ว",
+    "settings.save": "บันทึกการตั้งค่า",
+    "settings.typhoon.title": "Typhoon AI API",
+    "settings.typhoon.desc": "คีย์ API สำหรับเชื่อมต่อ Typhoon AI ภาษาไทย 用于วิเคราะห์ Job Description",
+    "settings.typhoon.apiKey": "API Key",
+    "settings.typhoon.hint": "รับคีย์ฟรีได้ที่ playground.opentyphoon.ai/api-key — รองรับภาษาไทย วิเคราะห์งานได้แม่นยำ",
+    "settings.database.title": "ฐานข้อมูล",
+    "settings.notifications.title": "การแจ้งเตือน",
+    "settings.notifications.gap": "แจ้งเตือนเมื่อมีทักษะวิกฤตใหม่",
+    "settings.notifications.monthly": "รายงานรายเดือนอัตโนมัติ",
+    "settings.notifications.risk": "แจ้งเตือนความเสี่ยงสูง",
+    "settings.status.title": "สถานะระบบ",
+    "settings.status.active": "เชื่อมต่อแล้ว",
   },
   en: {
     // Sidebar
@@ -436,6 +453,23 @@ export const translations = {
     "insights.strategy.s3.desc": "Develop a real-time employee skill database for strategic planning and data-driven decision making.",
     "insights.strategy.s4.title": "Continuous Tracking & KPIs",
     "insights.strategy.s4.desc": "Set monthly skill development KPIs and track progress to iteratively improve reskilling programs.",
+
+    // Settings
+    "settings.title": "Settings",
+    "settings.subtitle": "Manage system settings and connections",
+    "settings.saved": "Settings saved successfully",
+    "settings.save": "Save Settings",
+    "settings.typhoon.title": "Typhoon AI API",
+    "settings.typhoon.desc": "API key for connecting to Typhoon Thai AI for job description analysis",
+    "settings.typhoon.apiKey": "API Key",
+    "settings.typhoon.hint": "Get a free key at playground.opentyphoon.ai/api-key — supports Thai language with accurate job analysis",
+    "settings.database.title": "Database",
+    "settings.notifications.title": "Notifications",
+    "settings.notifications.gap": "Alert on new critical skill gaps",
+    "settings.notifications.monthly": "Monthly automated reports",
+    "settings.notifications.risk": "High risk job alerts",
+    "settings.status.title": "System Status",
+    "settings.status.active": "Connected",
   },
 } as const;
 

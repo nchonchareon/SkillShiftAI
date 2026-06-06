@@ -55,7 +55,7 @@ model MasterSkill {
   skillName   String      @unique
   category    String      // technical, soft, domain, management
   description String?
-  embedding   String? // pgvector: 1536 dimensions (stored as JSON, enable after installing pgvector)
+  embedding   Unsupported("vector(1536)")? // pgvector: 1536 dimensions
   createdAt   DateTime    @default(now())
   userSkills  UserSkill[]
   jobSkills   JobSkill[]
