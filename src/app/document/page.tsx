@@ -1,13 +1,37 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n";
-import { Download } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 
 export default function DocumentPage() {
   const { t } = useLanguage();
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [generating, setGenerating] = useState(false);
 
-  const handleDownload = () => {
-    window.print();
+  const handleDownload = async () => {
+    if (!contentRef.current) return;
+    setGenerating(true);
+
+    try {
+      const html2pdf = (await import("html2pdf.js")).default;
+      const opt = {
+        margin: 0,
+        filename: "SkillShiftAI-Blueprint.pdf",
+        image: { type: "jpeg" as const, quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          letterRendering: true,
+        },
+        jsPDF: { unit: "px", format: [1200, 800] as [number, number], orientation: "landscape" as const },
+      };
+      await html2pdf().set(opt).from(contentRef.current).save();
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+    } finally {
+      setGenerating(false);
+    }
   };
 
   return (
@@ -24,16 +48,27 @@ export default function DocumentPage() {
         </div>
         <button
           onClick={handleDownload}
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-primary-500/25 transition-all duration-300 text-sm shrink-0"
+          disabled={generating}
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-primary-500/25 transition-all duration-300 text-sm shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Download className="w-4 h-4" />
-          {t("doc.downloadPdf")}
+          {generating ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              {t("doc.generating") || "กำลังสร้าง PDF..."}
+            </>
+          ) : (
+            <>
+              <Download className="w-4 h-4" />
+              {t("doc.downloadPdf")}
+            </>
+          )}
         </button>
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════ */}
       {/* SLIDE 1: Title */}
       {/* ═══════════════════════════════════════════════════════════════ */}
+      <div ref={contentRef}>
       <div className="slide bg-gradient-to-br from-slate-900 via-slate-800 to-primary-900 rounded-2xl p-8 sm:p-12 text-white min-h-[500px] flex flex-col justify-center items-center text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyem0wLTRWMjhIMjR2Mmgxem0tMi0yYTEgMSAwIDEwMC0yIDAgMSAwIDAwMCAyek0zNCAyNGgtMnYyaDJ2LTJ6bS00IDB2Mmgydi0yaDN2LTJoLTN6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-40" />
         <div className="relative z-10">
@@ -296,6 +331,7 @@ export default function DocumentPage() {
             © 2026 SkillShiftAI — AI-Powered Job Redesign & Reskilling Platform. All rights reserved.
           </p>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -192,6 +192,7 @@ export const translations = {
     "nav.insights": "ข้อมูลเชิงลึกจาก AI",
     "doc.subtitle": "พิมพ์เขียวและแนวทางเชิงลึกในการพัฒนาระบบ",
     "doc.downloadPdf": "ดาวน์โหลด PDF",
+    "doc.generating": "กำลังสร้าง PDF...",
 
     // Insights Page
     "insights.title": "ข้อมูลเชิงลึกจาก AI",
@@ -441,6 +442,7 @@ export const translations = {
     "nav.insights": "AI Insights",
     "doc.subtitle": "Blueprint and in-depth guide for platform development",
     "doc.downloadPdf": "Download PDF",
+    "doc.generating": "Generating PDF...",
 
     // Insights Page
     "insights.title": "AI Insights",

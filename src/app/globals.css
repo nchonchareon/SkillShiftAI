@@ -41,6 +41,18 @@
 /* ═══════════════════════════════════════════════════════════════ */
 /* Print / PDF styles — Slide-style */
 /* ═══════════════════════════════════════════════════════════════ */
+
+/* Page breaks for html2pdf.js (outside print media) */
+.slide {
+  page-break-after: always;
+  break-after: page;
+}
+
+.slide:last-child {
+  page-break-after: auto;
+  break-after: auto;
+}
+
 @media print {
   @page {
     size: A4 landscape;
