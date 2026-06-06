@@ -1,18 +1,78 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/lib/i18n";
-import { Sparkles, ArrowRight, BookOpen, Target, TrendingUp, CheckCircle2 } from "lucide-react";
+import { Sparkles, ArrowRight, BookOpen, Target, TrendingUp, AlertTriangle, Loader2 } from "lucide-react";
 
-const pathways = [
-  { from: "Data Entry", to: "Data Analysis", skills: ["Python", "SQL", "Excel"], gap: 35, color: "from-red-500 to-orange-500" },
-  { from: "Customer Service", to: "CX Design", skills: ["UX Research", "Empathy Mapping", "Analytics"], gap: 28, color: "from-orange-500 to-yellow-500" },
-  { from: "Accounting", to: "Financial Analytics", skills: ["Python", "BI Tools", "Statistics"], gap: 40, color: "from-yellow-500 to-emerald-500" },
-  { from: "Manual Testing", to: "QA Automation", skills: ["Selenium", "CI/CD", "TypeScript"], gap: 45, color: "from-emerald-500 to-blue-500" },
-  { from: "Basic SQL", to: "Data Engineering", skills: ["Spark", "Airflow", "dbt"], gap: 55, color: "from-blue-500 to-purple-500" },
-];
+interface WeakSkill {
+  skillId: string;
+  skillName: string;
+  category: string;
+  currentLevel: number;
+}
+
+interface ReskillingUser {
+  userId: string;
+  name: string;
+  currentJobTitle: string | null;
+  totalSkills: number;
+  averageProficiency: number;
+  weakSkills: WeakSkill[];
+  needsReskilling: boolean;
+}
+
+interface ReskillingData {
+  summary: {
+    totalUsers: number;
+    usersNeedingReskilling: number;
+    totalWeakSkills: number;
+  };
+  users: ReskillingUser[];
+  needsReskilling: ReskillingUser[];
+}
+
+const categoryColors: Record<string, string> = {
+  technical: "from-blue-500 to-cyan-500",
+  soft: "from-orange-500 to-yellow-500",
+  domain: "from-emerald-500 to-teal-500",
+  management: "from-purple-500 to-pink-500",
+};
 
 export default function ReskillingPage() {
   const { locale } = useLanguage();
+  const [data, setData] = useState<ReskillingData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/reskilling")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success) setData(json.data);
+        else setError(json.error || "Failed to load");
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <AlertTriangle className="w-10 h-10 text-yellow-500 mx-auto mb-3" />
+          <p className="text-slate-500">{error || "No data"}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 sm:space-y-8 max-w-5xl">
@@ -26,9 +86,9 @@ export default function ReskillingPage() {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { icon: Target, label: locale === "th" ? "เส้นทางทั้งหมด" : "Total Pathways", value: "12", color: "text-primary-500" },
-          { icon: BookOpen, label: locale === "th" ? "ทักษะที่ต้องเรียน" : "Skills to Learn", value: "47", color: "text-emerald-500" },
-          { icon: TrendingUp, label: locale === "th" ? "อัตราสำเร็จ" : "Success Rate", value: "78%", color: "text-blue-500" },
+          { icon: Target, label: locale === "th" ? "พนักงานทั้งหมด" : "Total Employees", value: String(data.summary.totalUsers), color: "text-primary-500" },
+          { icon: BookOpen, label: locale === "th" ? "ต้องพัฒนาทักษะ" : "Need Reskilling", value: String(data.summary.usersNeedingReskilling), color: "text-emerald-500" },
+          { icon: TrendingUp, label: locale === "th" ? "ทักษะที่ต้องเรียน" : "Skills to Learn", value: String(data.summary.totalWeakSkills), color: "text-blue-500" },
         ].map((s, i) => {
           const Icon = s.icon;
           return (
@@ -41,33 +101,54 @@ export default function ReskillingPage() {
         })}
       </div>
 
-      {/* Pathways */}
+      {/* User Reskilling Cards */}
       <div className="space-y-4">
-        {pathways.map((p, i) => (
-          <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="font-semibold">{p.from}</span>
-                  <ArrowRight className="w-4 h-4 text-slate-400" />
-                  <span className="font-semibold text-primary-500">{p.to}</span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {p.skills.map((s, j) => (
-                    <span key={j} className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-medium">{s}</span>
-                  ))}
-                </div>
-              </div>
-              <div className="shrink-0 text-right">
-                <p className="text-sm text-slate-500 dark:text-slate-400">{locale === "th" ? "ช่องว่าง" : "Gap"}</p>
-                <p className="text-xl font-bold">{p.gap}%</p>
-              </div>
-            </div>
-            <div className="mt-3 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-              <div className={`h-full rounded-full bg-gradient-to-r ${p.color}`} style={{ width: `${100 - p.gap}%` }} />
-            </div>
+        {data.needsReskilling.length === 0 ? (
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 text-center">
+            <Sparkles className="w-10 h-10 text-emerald-500 mx-auto mb-3" />
+            <p className="text-slate-500">{locale === "th" ? "ทุกคนมีทักษะเพียงพอ!" : "Everyone has sufficient skills!"}</p>
           </div>
-        ))}
+        ) : (
+          data.needsReskilling.map((user) => (
+            <div key={user.userId} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">{user.name}</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{user.currentJobTitle || "-"}</p>
+                </div>
+                <div className="flex gap-4 text-sm">
+                  <div>
+                    <span className="text-slate-500 dark:text-slate-400">{locale === "th" ? "ทักษะ:" : "Skills:"} </span>
+                    <span className="font-semibold">{user.totalSkills}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 dark:text-slate-400">{locale === "th" ? "เฉลี่ย:" : "Avg:"} </span>
+                    <span className="font-semibold">{user.averageProficiency.toFixed(1)}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {user.weakSkills.map((skill) => (
+                  <div key={skill.skillId} className="flex items-center gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-medium">{skill.skillName}</span>
+                        <span className="px-2 py-0.5 rounded text-xs bg-slate-100 dark:bg-slate-800 text-slate-500">{skill.category}</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full bg-gradient-to-r ${categoryColors[skill.category] || "from-slate-400 to-slate-500"}`}
+                          style={{ width: `${(skill.currentLevel / 5) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                    <span className="text-xs font-semibold text-slate-500 w-8 text-right">{skill.currentLevel}/5</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
