@@ -86,7 +86,7 @@ Return ONLY valid JSON (no markdown, no code blocks):
 async function callGemini(prompt: string): Promise<any> {
   const { GoogleGenerativeAI } = await import("@google/generative-ai");
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const result = await model.generateContent(prompt);
   const text = result.response.text();
@@ -106,7 +106,7 @@ async function callGemini(prompt: string): Promise<any> {
 async function callGeminiFormat(prompt: string): Promise<string> {
   const { GoogleGenerativeAI } = await import("@google/generative-ai");
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const result = await model.generateContent(prompt);
   return result.response.text().trim();
