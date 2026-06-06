@@ -89,6 +89,7 @@ export default function SettingsPage() {
     message: string;
   } | null>(null);
   const [dbChecking, setDbChecking] = useState(false);
+  const [activeProvider, setActiveProvider] = useState("typhoon");
 
   // Check auth on mount
   useEffect(() => {
@@ -99,6 +100,10 @@ export default function SettingsPage() {
     const dbPref = sessionStorage.getItem("skillshiftai_db_enabled");
     if (dbPref !== null) {
       setDbEnabled(dbPref !== "false");
+    }
+    const savedProvider = localStorage.getItem("skillshiftai_active_provider");
+    if (savedProvider) {
+      setActiveProvider(savedProvider);
     }
   }, []);
 
@@ -161,6 +166,14 @@ export default function SettingsPage() {
           : p
       )
     );
+  };
+
+  const selectProvider = (id: string) => {
+    const provider = providers.find((p) => p.id === id);
+    if (provider && provider.enabled) {
+      setActiveProvider(id);
+      localStorage.setItem("skillshiftai_active_provider", id);
+    }
   };
 
   const updateProviderKey = (id: string, key: string) => {
@@ -314,21 +327,36 @@ export default function SettingsPage() {
                     >
                       {provider.enabled ? t("settings.status.active") : t("settings.status.inactive")}
                     </span>
+                    {provider.enabled && activeProvider === provider.id && (
+                      <span className="px-2 py-0.5 rounded text-xs font-bold bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
+                        {t("settings.aiProviders.inUse")}
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{provider.description}</p>
                 </div>
-                <button
-                  onClick={() => toggleProvider(provider.id)}
-                  className={`relative w-12 h-6 rounded-full transition-colors ${
-                    provider.enabled ? "bg-primary-500" : "bg-slate-300 dark:bg-slate-600"
-                  }`}
-                >
-                  <div
-                    className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                      provider.enabled ? "translate-x-6" : "translate-x-0.5"
+                <div className="flex items-center gap-2">
+                  {provider.enabled && activeProvider !== provider.id && (
+                    <button
+                      onClick={() => selectProvider(provider.id)}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-primary-500 text-white hover:bg-primary-600 transition-colors font-medium"
+                    >
+                      {t("settings.aiProviders.use")}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => toggleProvider(provider.id)}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${
+                      provider.enabled ? "bg-primary-500" : "bg-slate-300 dark:bg-slate-600"
                     }`}
-                  />
-                </button>
+                  >
+                    <div
+                      className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                        provider.enabled ? "translate-x-6" : "translate-x-0.5"
+                      }`}
+                    />
+                  </button>
+                </div>
               </div>
 
               {/* Token Usage Bar */}

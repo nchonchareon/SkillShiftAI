@@ -254,33 +254,41 @@ async function callOllamaFormat(prompt: string): Promise<string> {
 
 // ── Unified Interface ──
 
-async function generateJSON(prompt: string): Promise<any> {
-  if (AI_PROVIDER === "typhoon") {
+function resolveProvider(requested?: string): string {
+  const valid = ["typhoon", "ollama"];
+  if (requested && valid.includes(requested)) return requested;
+  return AI_PROVIDER;
+}
+
+async function generateJSON(prompt: string, provider?: string): Promise<any> {
+  const p = resolveProvider(provider);
+  if (p === "typhoon") {
     return callTyphoon(prompt);
   }
   return callOllama(prompt);
 }
 
-async function generateText(prompt: string): Promise<string> {
-  if (AI_PROVIDER === "typhoon") {
+async function generateText(prompt: string, provider?: string): Promise<string> {
+  const p = resolveProvider(provider);
+  if (p === "typhoon") {
     return callTyphoonFormat(prompt);
   }
   return callOllamaFormat(prompt);
 }
 
-export async function analyzeJobDescription(jdText: string) {
-  return generateJSON(buildRawPrompt(jdText));
+export async function analyzeJobDescription(jdText: string, provider?: string) {
+  return generateJSON(buildRawPrompt(jdText), provider);
 }
 
-export async function analyzeStructuredJob(formData: FormData) {
-  return generateJSON(buildStructuredPrompt(formData));
+export async function analyzeStructuredJob(formData: FormData, provider?: string) {
+  return generateJSON(buildStructuredPrompt(formData), provider);
 }
 
-export async function formatRawText(rawText: string): Promise<string> {
+export async function formatRawText(rawText: string, provider?: string): Promise<string> {
   const prompt = `Format this text into a clean Job Description with sections: Job Title, Department, Responsibilities, Tools, Required Skills.\n\nText:\n${rawText}`;
-  return generateText(prompt);
+  return generateText(prompt, provider);
 }
 
-export function getAIProvider(): string {
-  return AI_PROVIDER;
+export function getAIProvider(requested?: string): string {
+  return resolveProvider(requested);
 }

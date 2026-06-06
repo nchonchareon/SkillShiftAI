@@ -138,9 +138,13 @@ export default function JobsPage() {
         if (!jdText.trim()) return;
         body = { jobDescription: jdText };
       }
+      const provider = localStorage.getItem("skillshiftai_active_provider") || "";
       const res = await fetch("/api/ai/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(provider ? { "X-AI-Provider": provider } : {}),
+        },
         body: JSON.stringify(body),
       });
       const data = await res.json();
@@ -158,9 +162,13 @@ export default function JobsPage() {
     setFormatting(true);
     setError("");
     try {
+      const provider = localStorage.getItem("skillshiftai_active_provider") || "";
       const res = await fetch("/api/ai/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(provider ? { "X-AI-Provider": provider } : {}),
+        },
         body: JSON.stringify({ jobDescription: jdText, action: "format" }),
       });
       const data = await res.json();

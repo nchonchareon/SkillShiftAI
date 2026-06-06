@@ -10,6 +10,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Request body too large" }, { status: 413 });
     }
 
+    const provider = request.headers.get("x-ai-provider") || undefined;
     const body = await request.json();
     const { jobDescription, formData, action } = body;
 
@@ -20,8 +21,8 @@ export async function POST(request: NextRequest) {
       if (jobDescription.length > MAX_INPUT_LENGTH) {
         return NextResponse.json({ error: "Input too long" }, { status: 400 });
       }
-      const formatted = await formatRawText(jobDescription);
-      return NextResponse.json({ success: true, formatted, provider: getAIProvider() });
+      const formatted = await formatRawText(jobDescription, provider);
+      return NextResponse.json({ success: true, formatted, provider: getAIProvider(provider) });
     }
 
     if (formData && typeof formData === "object") {
@@ -40,8 +41,8 @@ export async function POST(request: NextRequest) {
         tasks: String(tasks || ""),
         tools: String(tools || ""),
         skills: String(skills || ""),
-      });
-      return NextResponse.json({ success: true, data: analysis, provider: getAIProvider() });
+      }, provider);
+      return NextResponse.json({ success: true, data: analysis, provider: getAIProvider(provider) });
     }
 
     if (!jobDescription || typeof jobDescription !== "string") {
@@ -56,9 +57,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Job description seems too short. Please provide more detail." }, { status: 400 });
     }
 
-    const analysis = await analyzeJobDescription(jobDescription);
+    const analysis = await analyzeJobDescription(jobDescription, provider);
 
-    return NextResponse.json({ success: true, data: analysis, provider: getAIProvider() });
+    return NextResponse.json({ success: true, data: analysis, provider: getAIProvider(provider) });
   } catch (error) {
     console.error("[AI Analyze Error]", error);
     return NextResponse.json({ error: "Failed to analyze job description" }, { status: 500 });
