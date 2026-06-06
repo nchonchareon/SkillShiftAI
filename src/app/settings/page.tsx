@@ -149,6 +149,7 @@ export default function SettingsPage() {
   const handleLogout = () => {
     sessionStorage.removeItem("skillshiftai_auth");
     sessionStorage.removeItem("skillshiftai_user");
+    sessionStorage.removeItem("skillshiftai_db_enabled");
     setAuthenticated(false);
   };
 

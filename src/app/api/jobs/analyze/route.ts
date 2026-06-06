@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, data: result }, { status: 201 });
-  } catch (error: any) {
+  } catch (error) {
     console.error("[Analyze POST Error]", error);
-    return NextResponse.json({ error: error.message || "Failed to save analysis result" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to save analysis result" }, { status: 500 });
   }
 }

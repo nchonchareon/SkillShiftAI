@@ -9,7 +9,8 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const skillFilter = searchParams.get("skill");
-    const minProficiency = parseInt(searchParams.get("minProficiency") || "1");
+    const rawMinProf = parseInt(searchParams.get("minProficiency") || "1");
+    const minProficiency = isNaN(rawMinProf) || rawMinProf < 1 || rawMinProf > 5 ? 1 : rawMinProf;
 
     const users = await prisma.user.findMany({
       include: {
@@ -79,8 +80,8 @@ export async function GET(request: NextRequest) {
         talent: talentPool,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("[Talent GET Error]", error);
-    return NextResponse.json({ error: error.message || "Failed to fetch talent pool" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch talent pool" }, { status: 500 });
   }
 }

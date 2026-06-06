@@ -110,8 +110,8 @@ export async function GET(request: NextRequest) {
         needsReskilling,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("[Reskilling GET Error]", error);
-    return NextResponse.json({ error: error.message || "Failed to fetch reskilling data" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch reskilling data" }, { status: 500 });
   }
 }

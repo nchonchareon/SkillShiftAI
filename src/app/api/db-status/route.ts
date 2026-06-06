@@ -41,7 +41,7 @@ export async function GET() {
     return NextResponse.json({
       configured: true,
       connected: false,
-      message: error instanceof Error ? error.message : "Connection failed",
+      message: "Connection failed",
     });
   }
 }
