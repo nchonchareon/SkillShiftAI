@@ -1,7 +1,10 @@
 const OLLAMA_URL = process.env.OLLAMA_URL || "http://localhost:11434";
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen2.5:1.5b";
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
-const AI_PROVIDER = process.env.AI_PROVIDER || (GEMINI_API_KEY ? "gemini" : "ollama");
+const TYPHOON_API_KEY = process.env.TYPHOON_API_KEY || "";
+const TYPHOON_MODEL = process.env.TYPHOON_MODEL || "typhoon-v2.5-30b-a3b-instruct";
+const AI_PROVIDER =
+  process.env.AI_PROVIDER ||
+  (TYPHOON_API_KEY ? "typhoon" : "ollama");
 
 interface FormData {
   jobTitle: string;
@@ -81,35 +84,97 @@ Return ONLY valid JSON (no markdown, no code blocks):
 }`;
 }
 
-// ── Gemini Provider ──
+// ── Typhoon Provider (OpenAI-compatible) ──
 
-async function callGemini(prompt: string): Promise<any> {
-  const { GoogleGenerativeAI } = await import("@google/generative-ai");
-  const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
-  const result = await model.generateContent(prompt);
-  const text = result.response.text();
-
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
-    throw new Error("AI did not return valid JSON. Please try again.");
-  }
+async function callTyphoon(prompt: string): Promise<any> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 60000);
 
   try {
-    return JSON.parse(jsonMatch[0]);
-  } catch {
-    throw new Error("AI returned invalid JSON. Please try again.");
+    const response = await fetch("https://api.opentyphoon.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${TYPHOON_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: TYPHOON_MODEL,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a job analyst for a reskilling platform. Always return valid JSON. No markdown. No code blocks.",
+          },
+          { role: "user", content: prompt },
+        ],
+        max_tokens: 2048,
+        temperature: 0.6,
+        top_p: 0.95,
+        repetition_penalty: 1.05,
+        stream: false,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`Typhoon API error (${response.status}): ${err}`);
+    }
+
+    const data = await response.json();
+    const text: string = data.choices?.[0]?.message?.content || "";
+
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("AI did not return valid JSON. Please try again.");
+    }
+
+    try {
+      return JSON.parse(jsonMatch[0]);
+    } catch {
+      throw new Error("AI returned invalid JSON. Please try again.");
+    }
+  } catch (err: any) {
+    if (err.name === "AbortError") {
+      throw new Error("AI analysis timed out. Please try again.");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
-async function callGeminiFormat(prompt: string): Promise<string> {
-  const { GoogleGenerativeAI } = await import("@google/generative-ai");
-  const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+async function callTyphoonFormat(prompt: string): Promise<string> {
+  const response = await fetch("https://api.opentyphoon.ai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${TYPHOON_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: TYPHOON_MODEL,
+      messages: [
+        {
+          role: "system",
+          content: "You are a job analyst for a reskilling platform.",
+        },
+        { role: "user", content: prompt },
+      ],
+      max_tokens: 2048,
+      temperature: 0.6,
+      top_p: 0.95,
+      repetition_penalty: 1.05,
+      stream: false,
+    }),
+  });
 
-  const result = await model.generateContent(prompt);
-  return result.response.text().trim();
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Typhoon API error (${response.status}): ${err}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content?.trim() || "";
 }
 
 // ── Ollama Provider ──
@@ -190,15 +255,15 @@ async function callOllamaFormat(prompt: string): Promise<string> {
 // ── Unified Interface ──
 
 async function generateJSON(prompt: string): Promise<any> {
-  if (AI_PROVIDER === "gemini") {
-    return callGemini(prompt);
+  if (AI_PROVIDER === "typhoon") {
+    return callTyphoon(prompt);
   }
   return callOllama(prompt);
 }
 
 async function generateText(prompt: string): Promise<string> {
-  if (AI_PROVIDER === "gemini") {
-    return callGeminiFormat(prompt);
+  if (AI_PROVIDER === "typhoon") {
+    return callTyphoonFormat(prompt);
   }
   return callOllamaFormat(prompt);
 }

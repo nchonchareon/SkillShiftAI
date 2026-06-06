@@ -26,7 +26,7 @@ export default function AboutPage() {
   ];
 
   const references = [
-    { label: t("about.references.googleAI"), desc: t("about.references.googleAIDesc"), url: "https://ai.google.dev/docs/gemini_api_overview" },
+    { label: t("about.references.typhoon"), desc: t("about.references.typhoonDesc"), url: "https://docs.opentyphoon.ai/en/" },
     { label: t("about.references.pgvector"), desc: t("about.references.pgvectorDesc"), url: "https://github.com/pgvector/pgvector" },
     { label: t("about.references.nextjs"), desc: t("about.references.nextjsDesc"), url: "https://nextjs.org/docs" },
     { label: t("about.references.prisma"), desc: t("about.references.prismaDesc"), url: "https://www.prisma.io/docs" },
