@@ -23,7 +23,7 @@ export default function SettingsPage() {
         </div>
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium mb-1">Gemini API Key</label>
+            <label className="block text-sm font-medium mb-1">Ollama API URL</label>
             <input
               type="password"
               placeholder="AIza..."

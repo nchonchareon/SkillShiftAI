@@ -19,7 +19,7 @@ AI-Powered Job Redesign & Reskilling Platform — แพลตฟอร์มอ
 |-------|-----------|
 | Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS |
 | UI Components | Lucide React, Recharts |
-| AI Engine | Ollama + Qwen3 1.7B (Local, Free) |
+| AI Engine | Ollama + Qwen2.5 1.5B (Local, Free) |
 | Database | PostgreSQL 17 + pgvector |
 | ORM | Prisma |
 | Language | Thai / English i18n |
@@ -45,7 +45,7 @@ npm install
 ```bash
 # Install Ollama from https://ollama.com
 # Then pull the model
-ollama pull qwen3:1.7b
+ollama pull qwen2.5:1.5b
 
 # Start Ollama server
 ollama serve
@@ -111,14 +111,14 @@ The app uses **Ollama** with **Qwen3 1.7B** model for local AI inference.
 
 | Setting | Value |
 |---------|-------|
-| Model | `qwen3:1.7b` (1.4GB) |
+| Model | `qwen2.5:1.5b` (986MB) |
 | Temperature | 0.1 |
 | Max tokens | 1024 |
-| Inference time | ~3-5 seconds |
+| Inference time | ~20-25 seconds |
 
 Change model in `.env.local`:
 ```
-OLLAMA_MODEL=qwen3:1.7b
+OLLAMA_MODEL=qwen2.5:1.5b
 ```
 
 ## Database Schema

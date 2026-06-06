@@ -1,5 +1,5 @@
 const OLLAMA_URL = process.env.OLLAMA_URL || "http://localhost:11434";
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen3:1.7b";
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen2.5:1.5b";
 
 interface FormData {
   jobTitle: string;
@@ -10,89 +10,71 @@ interface FormData {
 }
 
 function buildStructuredPrompt(formData: FormData): string {
-  return `You are an expert job analyst. Analyze the following structured job information and return a JSON object with this exact structure:
+  return `You are a job analyst. Analyze this job and assess automation risk for each task.
 
+Job Title: ${formData.jobTitle}
+Department: ${formData.department}
+Tasks:
+${formData.tasks}
+Tools: ${formData.tools}
+Skills: ${formData.skills}
+
+Return ONLY valid JSON (no markdown, no code blocks):
 {
-  "job_title": "string",
-  "department": "string",
-  "summary": "Brief 2-sentence summary",
+  "job_title": "${formData.jobTitle}",
+  "department": "${formData.department}",
+  "summary": "2 sentence summary of the role",
   "tasks": [
     {
-      "task_description": "string",
-      "automation_risk_score": 0.0-1.0,
-      "impact_level": "low|medium|high|critical",
-      "frequency": "daily|weekly|monthly|ad-hoc",
+      "task_description": "each task from above",
+      "automation_risk_score": 0.0 to 1.0,
+      "impact_level": "low or medium or high or critical",
+      "frequency": "daily or weekly or monthly",
       "estimated_hours_per_week": number
     }
   ],
   "required_skills": [
     {
-      "skill_name": "string",
-      "category": "technical|soft|domain|management",
-      "importance": 1-5
+      "skill_name": "skill name",
+      "category": "technical or soft or domain or management",
+      "importance": 1 to 5
     }
   ],
-  "automation_risk_average": 0.0-1.0,
-  "redesign_recommendations": [
-    "string"
-  ]
-}
-
-Rules:
-- automation_risk_score: 0.0 = safe from automation, 1.0 = fully automatable
-- impact_level: based on business impact if the task is automated
-- Estimate realistically based on current AI/automation capabilities
-- Extract tasks from the "Tasks & Responsibilities" section, splitting multi-line text into individual tasks
-- Return ONLY valid JSON, no markdown, no explanation
-- /no_think
-
-Structured Job Information:
-- Job Title: ${formData.jobTitle}
-- Department: ${formData.department}
-- Tasks & Responsibilities:
-${formData.tasks}
-- Tools & Software: ${formData.tools}
-- Key Skills: ${formData.skills}`;
+  "automation_risk_average": 0.0 to 1.0,
+  "redesign_recommendations": ["recommendation"]
+}`;
 }
 
 function buildRawPrompt(jdText: string): string {
-  return `You are an expert job analyst. Analyze the following job description and return a JSON object with this exact structure:
+  return `You are a job analyst. Analyze this job description and assess automation risk.
 
+Job Description:
+${jdText}
+
+Return ONLY valid JSON (no markdown, no code blocks):
 {
-  "job_title": "string",
-  "department": "string",
-  "summary": "Brief 2-sentence summary",
+  "job_title": "detected title",
+  "department": "detected department",
+  "summary": "2 sentence summary",
   "tasks": [
     {
-      "task_description": "string",
-      "automation_risk_score": 0.0-1.0,
-      "impact_level": "low|medium|high|critical",
-      "frequency": "daily|weekly|monthly|ad-hoc",
+      "task_description": "each task found",
+      "automation_risk_score": 0.0 to 1.0,
+      "impact_level": "low or medium or high or critical",
+      "frequency": "daily or weekly or monthly",
       "estimated_hours_per_week": number
     }
   ],
   "required_skills": [
     {
-      "skill_name": "string",
-      "category": "technical|soft|domain|management",
-      "importance": 1-5
+      "skill_name": "skill name",
+      "category": "technical or soft or domain or management",
+      "importance": 1 to 5
     }
   ],
-  "automation_risk_average": 0.0-1.0,
-  "redesign_recommendations": [
-    "string"
-  ]
-}
-
-Rules:
-- automation_risk_score: 0.0 = safe from automation, 1.0 = fully automatable
-- impact_level: based on business impact if the task is automated
-- Estimate realistically based on current AI/automation capabilities
-- Return ONLY valid JSON, no markdown, no explanation
-- /no_think
-
-Job Description:
-${jdText}`;
+  "automation_risk_average": 0.0 to 1.0,
+  "redesign_recommendations": ["recommendation"]
+}`;
 }
 
 export async function analyzeJobDescription(jdText: string) {
@@ -106,19 +88,7 @@ export async function analyzeStructuredJob(formData: FormData) {
 }
 
 export async function formatRawText(rawText: string): Promise<string> {
-  const prompt = `You are a professional HR document formatter. Take the following raw text and format it into a clean, structured Job Description with clear sections.
-
-Format the output as plain text with these sections:
-- Job Title
-- Department
-- Responsibilities (numbered list)
-- Tools & Software
-- Required Skills
-
-Raw text:
-${rawText}
-
-Return ONLY the formatted text, no markdown code blocks, no explanation. /no_think`;
+  const prompt = `Format this text into a clean Job Description with sections: Job Title, Department, Responsibilities, Tools, Required Skills.\n\nText:\n${rawText}`;
 
   const response = await fetch(`${OLLAMA_URL}/api/generate`, {
     method: "POST",
@@ -128,8 +98,8 @@ Return ONLY the formatted text, no markdown code blocks, no explanation. /no_thi
       prompt,
       stream: false,
       options: {
-        temperature: 0.3,
-        num_predict: 2048,
+        temperature: 0.1,
+        num_predict: 1024,
       },
     }),
   });
@@ -146,7 +116,7 @@ Return ONLY the formatted text, no markdown code blocks, no explanation. /no_thi
 
 async function callOllama(prompt: string) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
+  const timeoutId = setTimeout(() => controller.abort(), 60000);
 
   try {
     const response = await fetch(`${OLLAMA_URL}/api/generate`, {
@@ -157,8 +127,10 @@ async function callOllama(prompt: string) {
         prompt,
         stream: false,
         options: {
-          temperature: 0.3,
+          temperature: 0.1,
           num_predict: 1024,
+          top_k: 20,
+          top_p: 0.8,
         },
       }),
       signal: controller.signal,
@@ -172,10 +144,8 @@ async function callOllama(prompt: string) {
     const data = await response.json();
     const text: string = data.response || "";
 
-    // Strip <think>...</think> blocks if present
     let cleaned = text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
 
-    // Try to extract JSON from the response
     const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error("AI did not return valid JSON. Please try again.");
@@ -188,7 +158,7 @@ async function callOllama(prompt: string) {
     }
   } catch (err: any) {
     if (err.name === "AbortError") {
-      throw new Error("AI analysis timed out. The model may be loading for the first time — please try again in 30 seconds.");
+      throw new Error("AI analysis timed out. Please try again.");
     }
     throw err;
   } finally {

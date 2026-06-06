@@ -213,7 +213,7 @@ export default function DocumentPage() {
             {[
               { label: "Frontend", items: "Next.js 14, TypeScript, Tailwind CSS, Recharts, Lucide React" },
               { label: "Backend", items: "Next.js API Routes, Prisma ORM" },
-              { label: "Database", items: "PostgreSQL + pgvector (Vector Search)" },
+              { label: "Database", items: "PostgreSQL (Vector Search)" },
               { label: "AI Engine", items: "Ollama + Qwen3 8B (Free, Local)" },
             ].map((item) => (
               <div key={item.label} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
