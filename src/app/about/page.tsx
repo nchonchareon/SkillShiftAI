@@ -27,14 +27,14 @@ export default function AboutPage() {
 
   const references = [
     { label: t("about.references.typhoon"), desc: t("about.references.typhoonDesc"), url: "https://docs.opentyphoon.ai/en/" },
-    { label: t("about.references.pgvector"), desc: t("about.references.pgvectorDesc"), url: "https://github.com/pgvector/pgvector" },
+    { label: t("about.references.AI"), desc: t("about.references.AIDesc"), url: "https://github.com/pgvector/pgvector" },
     { label: t("about.references.nextjs"), desc: t("about.references.nextjsDesc"), url: "https://nextjs.org/docs" },
     { label: t("about.references.prisma"), desc: t("about.references.prismaDesc"), url: "https://www.prisma.io/docs" },
     { label: t("about.references.recharts"), desc: t("about.references.rechartsDesc"), url: "https://recharts.org/en-US" },
     { label: t("about.references.lucide"), desc: t("about.references.lucideDesc"), url: "https://lucide.dev" },
-    { label: t("about.references.wef"), desc: t("about.references.wefDesc"), url: "https://www.weforum.org/publications/the-future-of-jobs-report-2023/" },
+    { label: t("about.references.wef"), desc: t("about.references.wefDesc"), url: "https://www.weforum.org/publications/the-future-of-jobs-report-2025/" },
     { label: t("about.references.mckinsey"), desc: t("about.references.mckinseyDesc"), url: "https://www.mckinsey.com/mgi/our-research" },
-    { label: t("about.references.ilo"), desc: t("about.references.iloDesc"), url: "https://www.ilo.org/global/research/global-reports/global-employment-trends" },
+    { label: t("about.references.ilo"), desc: t("about.references.iloDesc"), url: "https://www.ilo.org/publications/flagship-reports/world-employment-and-social-outlook-trends-2025" },
   ];
 
   const steps = [

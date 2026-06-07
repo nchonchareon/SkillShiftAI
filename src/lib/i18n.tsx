@@ -149,12 +149,12 @@ export const translations = {
     "about.references.rechartsDesc": "ไลบรารีกราฟสำหรับ React สำหรับสร้าง Dashboard",
     "about.references.lucide": "Lucide Icons",
     "about.references.lucideDesc": "ไอคอนแบบ Open-source สำหรับ UI",
-    "about.references.wef": "World Economic Forum - Future of Jobs Report",
-    "about.references.wefDesc": "รายงานเกี่ยวกับแนวโน้มตลาดแรงงานและการเปลี่ยนแปลงทักษะในยุค AI",
+    "about.references.wef": "World Economic Forum - Future of Jobs Report 2025",
+    "about.references.wefDesc": "รายงานเกี่ยวกับแนวโน้มตลาดแรงงานและการเปลี่ยนแปลงทักษะในยุค AI (มกราคม 2025)",
     "about.references.mckinsey": "McKinsey Global Institute - Skills Gap Research",
     "about.references.mckinseyDesc": "งานวิจัยเกี่ยวกับช่องว่างทักษะและการพัฒนาบุคลากรในยุคดิจิทัล",
-    "about.references.ilo": "ILO - Globalmployment Trends",
-    "about.references.iloDesc": "รายงานแนวโน้มการจ้างงานทั่วโลกจากองค์การแรงงานระหว่างประเทศ",
+    "about.references.ilo": "ILO - World Employment and Social Outlook: Trends 2025",
+    "about.references.iloDesc": "รายงานแนวโน้มการจ้างงานทั่วโลกจากองค์การแรงงานระหว่างประเทศ (มกราคม 2025)",
 
     // Jobs Page - Guided Form
     "jobs.guided.tab": "กรอกตามโครงสร้างแนะนำ",
@@ -467,12 +467,12 @@ export const translations = {
     "about.references.rechartsDesc": "React charting library for building dashboards",
     "about.references.lucide": "Lucide Icons",
     "about.references.lucideDesc": "Open-source icon set for UI design",
-    "about.references.wef": "World Economic Forum - Future of Jobs Report",
-    "about.references.wefDesc": "Report on labor market trends and skill transformation in the AI era",
+    "about.references.wef": "World Economic Forum - Future of Jobs Report 2025",
+    "about.references.wefDesc": "Report on labor market trends and skill transformation in the AI era (January 2025)",
     "about.references.mckinsey": "McKinsey Global Institute - Skills Gap Research",
     "about.references.mckinseyDesc": "Research on workforce skill gaps and digital-age talent development",
-    "about.references.ilo": "ILO - Global Employment Trends",
-    "about.references.iloDesc": "Global employment trends report from the International Labour Organization",
+    "about.references.ilo": "ILO - World Employment and Social Outlook: Trends 2025",
+    "about.references.iloDesc": "Global employment trends report from the International Labour Organization (January 2025)",
 
     // Jobs Page - Guided Form
     "jobs.guided.tab": "Guided Form",
