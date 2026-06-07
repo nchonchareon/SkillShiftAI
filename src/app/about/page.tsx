@@ -33,7 +33,7 @@ export default function AboutPage() {
     { label: t("about.references.recharts"), desc: t("about.references.rechartsDesc"), url: "https://recharts.org/en-US" },
     { label: t("about.references.lucide"), desc: t("about.references.lucideDesc"), url: "https://lucide.dev" },
     { label: t("about.references.wef"), desc: t("about.references.wefDesc"), url: "https://www.weforum.org/publications/the-future-of-jobs-report-2025/" },
-    { label: t("about.references.mckinsey"), desc: t("about.references.mckinseyDesc"), url: "https://www.mckinsey.com/mgi/our-research" },
+    { label: t("about.references.mckinsey"), desc: t("about.references.mckinseyDesc"), url: "https://www.mckinsey.com/capabilities/people-and-organizational-performance/our-insights/the-organization-blog/using-skill-gap-assessments-to-help-future-proof-your-organization" },
     { label: t("about.references.ilo"), desc: t("about.references.iloDesc"), url: "https://www.ilo.org/publications/flagship-reports/world-employment-and-social-outlook-trends-2025" },
   ];
 
